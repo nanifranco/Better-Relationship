@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Nov",
+    "slug": "nov",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.nov.app",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Nov usa Face ID para proteger tus notas."
+      }
+    },
+    "android": {
+      "package": "com.nov.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#111113"
+      }
+    },
+    "plugins": [
+      [
+        "expo-local-authentication",
+        { "faceIDPermission": "Nov usa Face ID para proteger tus notas." }
+      ],
+      "expo-notifications"
+    ]
+  }
+}

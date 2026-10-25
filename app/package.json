@@ -1,0 +1,23 @@
+{
+  "name": "nov",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "sync": "node scripts/sincronizar.js",
+    "start": "node scripts/sincronizar.js && expo start",
+    "android": "node scripts/sincronizar.js && expo start --android",
+    "ios": "node scripts/sincronizar.js && expo start --ios"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~58.0.19",
+    "expo-local-authentication": "~58.0.2",
+    "expo-notifications": "~58.1.6",
+    "expo-status-bar": "~58.0.4",
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-webview": "14.0.1"
+  }
+}
