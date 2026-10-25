@@ -624,6 +624,75 @@ main.anim .radar .rp{animation:abre .9s cubic-bezier(.2,.9,.3,1.2) both .15s}
 @keyframes vuela{0%{opacity:1;transform:translate(-50%,-50%) scale(.4)}75%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--rot)) scale(1)}}
 .lluvia{position:absolute;top:-16px;width:8px;height:14px;border-radius:2px;background:var(--c);animation:llueve var(--t,2.4s) cubic-bezier(.3,.6,.6,1) forwards}
 @keyframes llueve{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:.9}}
+
+/* ================= Nov 3: historias, mazo y consejero ================= */
+@keyframes rota{to{transform:rotate(360deg)}}
+@keyframes llena{to{width:100%}}
+.hist-btn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin-bottom:14px;padding:4px 2px}
+.hist-ring{position:relative;width:64px;height:64px;flex:none;border-radius:50%}
+.hist-ring::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(#FF4D7E,#FFC23D,#7B5CFF,#2F9BFF,#FF4D7E);animation:rota 5s linear infinite}
+.hist-ring img,.hist-ring span{position:absolute;inset:3px;border-radius:50%;border:2.5px solid var(--bg);object-fit:cover;width:calc(100% - 6px);height:calc(100% - 6px);background:var(--fill);display:grid;place-items:center;font-weight:800;font-size:1.4rem;color:var(--muted)}
+.hist-btn b{display:block;font-size:1.02rem;font-weight:800}
+.hist-btn .meta{margin:0}
+.hist-btn .play{margin-left:auto;width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.hist-btn .play svg{width:16px;height:16px;fill:currentColor;stroke:none}
+.hist-v{position:fixed;inset:0;z-index:60;color:#FFFFFF;display:flex;flex-direction:column;overflow:hidden;
+  background:radial-gradient(420px 420px at 85% 15%,rgba(255,255,255,.18),transparent 60%),radial-gradient(380px 380px at 10% 90%,rgba(0,0,0,.18),transparent 60%),linear-gradient(160deg,var(--g1),var(--g2));animation:aparece .2s ease;
+  -webkit-user-select:none;user-select:none;touch-action:manipulation}
+.hist-bar{display:flex;gap:4px;padding:calc(12px + env(safe-area-inset-top,0px)) 14px 0;position:relative;z-index:3}
+.hist-bar i{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.35);overflow:hidden}
+.hist-bar b{display:block;height:100%;width:0;background:#FFFFFF}
+.hist-bar i.lleno b{width:100%}
+.hist-bar i.act b{animation:llena 6.5s linear forwards}
+.hist-v.pausa .hist-bar i.act b{animation-play-state:paused}
+.hist-x{position:absolute;top:calc(22px + env(safe-area-inset-top,0px));right:8px;z-index:4;width:44px;height:44px;display:grid;place-items:center;color:#FFFFFF}
+.hist-c{position:relative;z-index:2;flex:1;width:100%;max-width:520px;margin:0 auto;display:flex;flex-direction:column;justify-content:center;padding:24px 28px 90px;pointer-events:none}
+.hist-et{font-size:.86rem;font-weight:800;text-transform:uppercase;letter-spacing:.09em;opacity:.88}
+.hist-t{font-size:clamp(1.75rem,7.6vw,2.5rem);font-weight:800;line-height:1.14;letter-spacing:-.025em;margin-top:10px;animation:entra .5s cubic-bezier(.2,.8,.2,1)}
+.hist-s{font-size:1.05rem;font-weight:600;opacity:.9;margin-top:14px;animation:entra .5s cubic-bezier(.2,.8,.2,1) .08s both}
+.hist-foto{width:116px;height:116px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 4px rgba(255,255,255,.55);margin-bottom:24px;animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.hist-fin{pointer-events:auto;align-self:flex-start;margin-top:28px;background:#FFFFFF;color:var(--g1)}
+.hist-zona{position:absolute;top:0;bottom:0;z-index:1}
+.hist-zona.izq{left:0;width:32%}
+.hist-zona.der{right:0;width:68%}
+.hist-pie{position:absolute;left:0;right:0;bottom:calc(18px + env(safe-area-inset-bottom,0px));text-align:center;font-size:.78rem;font-weight:700;opacity:.7;z-index:2;pointer-events:none}
+
+.deck{position:relative;height:262px;margin:2px 0 12px}
+.dk{position:absolute;inset:0 0 18px;border-radius:26px;padding:20px;color:#FFFFFF;display:flex;flex-direction:column;justify-content:space-between;
+  background:radial-gradient(260px 200px at 90% 0%,rgba(255,255,255,.2),transparent 60%),linear-gradient(135deg,var(--g1),var(--g2));box-shadow:0 18px 30px -18px var(--g1);
+  transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .32s ease;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.dk[data-pos="1"]{transform:translateY(10px) scale(.95);opacity:.8}
+.dk[data-pos="2"]{transform:translateY(20px) scale(.9);opacity:.5}
+.dk[data-pos="0"]{z-index:3;cursor:grab}
+.dk.arrastra{transition:none;cursor:grabbing}
+.dk-e{display:inline-flex;align-self:flex-start;font-size:.78rem;font-weight:800;background:rgba(255,255,255,.2);border-radius:999px;padding:5px 11px}
+.dk-t{font-size:1.45rem;font-weight:800;line-height:1.2;letter-spacing:-.02em}
+.dk-m{font-size:.86rem;font-weight:600;opacity:.88}
+.dk-si,.dk-no{position:absolute;top:64px;font-size:.9rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border:3px solid #FFFFFF;border-radius:10px;padding:3px 10px;opacity:0;pointer-events:none}
+.dk-si{left:20px;transform:rotate(-12deg)}
+.dk-no{right:20px;transform:rotate(12deg)}
+.deck-b{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px}
+.deck-b .redondo{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);transition:transform .15s ease}
+.deck-b .redondo:active{transform:scale(.9)}
+.deck-b .redondo svg{width:24px;height:24px}
+.deck-b .no{color:var(--muted)}
+.deck-b .si{color:var(--accent)}
+.deck-b .si svg{fill:currentColor}
+.deck-fin{text-align:center;padding:40px 10px;color:var(--muted);font-weight:600}
+
+.coach{margin-bottom:14px;position:relative;overflow:hidden}
+.coach::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:linear-gradient(135deg,#FF4D7E,#7B5CFF,#2F9BFF);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.coach-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.coach-i{width:44px;height:44px;border-radius:14px;flex:none;display:grid;place-items:center;color:#FFFFFF;background:linear-gradient(135deg,#FF4D7E,#7B5CFF);animation:late 2.2s ease-in-out infinite}
+.coach-i svg{width:22px;height:22px}
+.coach h2{font-size:1.08rem;font-weight:800;letter-spacing:-.02em}
+.coach .chips{margin:0 -16px;padding:2px 16px 12px}
+.coach textarea{min-height:84px}
+.coach-r{margin-top:14px;padding:14px 16px;border-radius:16px;background:var(--fill);white-space:pre-wrap;font-size:.98rem;line-height:1.55}
+.coach-r.pensando{color:var(--muted);font-weight:600}
+.coach-r.pensando::after{content:"";display:inline-block;width:1.2em;text-align:left;animation:puntos 1.2s steps(4) infinite}
+@keyframes puntos{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -633,6 +702,7 @@ main.anim .radar .rp{animation:abre .9s cubic-bezier(.2,.9,.3,1.2) both .15s}
 <div id="toast" role="status" aria-live="polite"></div>
 <input type="file" id="foto-in" accept="image/*" hidden>
 <div id="fx" aria-hidden="true"></div>
+<div id="historia"></div>
 
 <script>
 (function(){
@@ -891,6 +961,7 @@ var I = {
   comida: svg('<path d="M6 3v6a2.5 2.5 0 0 0 5 0V3M8.5 3v18M17.5 21v-8M17.5 13c-1.7 0-3-1.3-3-3.5C14.5 6 16 3.5 17.5 3z"/>'),
   bolsa: svg('<path d="M5 8h14l-1.2 12.5H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>'),
   flama: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.5c-4.1 0-6.8-2.7-6.8-6.5 0-3.4 2.3-5.5 3.8-7.6.4 1.9 1.5 3.1 2.8 3.5.8-2.7 1.7-5.6 4-7.6.2 2.9 1.7 4.6 2.8 6.2 1 1.5 1.4 3 1.4 4.6 0 4.4-2.7 7.4-6.8 7.4z"/></svg>',
+  play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>',
   cam: svg('<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
   tag: svg('<path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.3"/>'),
   no: svg('<circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/>'),
@@ -939,7 +1010,7 @@ function normalize(o){
 function copia(o){ return JSON.parse(JSON.stringify(o)); }
 
 var state = normalize(null);
-var ui = {anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genVistos:[], tab:'hoy', sub:'vida', vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
+var ui = {hist:null, histHold:false, pasados:[], coachQ:'', coachR:'', coachOn:false, anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genVistos:[], tab:'hoy', sub:'vida', vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
 var docRef = null, habiaLocal = false;
 var saveTimer = null, escribiendo = false, pendiente = false;
 
@@ -1386,6 +1457,194 @@ function retoSemana(){
 }
 function saludo(){ var h = new Date().getHours(); return h < 5 ? 'Buenas noches' : h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches'; }
 
+/* ---------- antes de verla ---------- */
+function historias(){
+  var t = hoy(), out = [], col = 0;
+  function add(x){ x.col = COLORES[col++ % COLORES.length]; out.push(x); }
+  var ini = parse(state.inicio), sub = '';
+  if(ini && dias(ini, t) >= 0){
+    var tj = tiempoJuntas(ini, t), pz = [];
+    if(tj.a) pz.push(plural(tj.a, 'año', 'años')); if(tj.m) pz.push(plural(tj.m, 'mes', 'meses')); if(tj.d || !pz.length) pz.push(plural(tj.d, 'día', 'días'));
+    sub = unir(pz) + ' juntas';
+  }
+  add({et:'Antes de verla', t:'Vas a ver a María', s:sub, foto:state.fotoMaria});
+  state.semana.slice().sort(function(a, b){ return (a.fecha || '9999') < (b.fecha || '9999') ? -1 : 1; }).slice(0, 2).forEach(function(x){
+    var d = parse(x.fecha), n = d ? dias(t, d) : null;
+    add({et:'Pregúntale por', t:x.texto, s: n === null ? 'Lo trae en la cabeza estos días' : n < 0 ? 'Ya pasó: pregúntale cómo le fue' : n === 0 ? 'Es hoy' : cuandoTxt(n)});
+  });
+  add({et:'Una pregunta para hoy', t:preguntaSemana()});
+  var vp = state.valoro.filter(function(x){ return !x.dicho; })[0];
+  if(vp) add({et:'Díselo hoy', t:'«' + vp.texto + '»', s:'Lo valoras y todavía no se lo dices'});
+  var tm = state.temas.filter(function(x){ return !x.hablado && (x.tipo === 'bonito' || x.urge === 'pronto'); })[0];
+  if(tm) add({et: tm.tipo === 'bonito' ? 'Tienes guardado para decirle' : 'Tienes pendiente platicar', t:tm.texto, s: tm.tipo === 'molesta' ? 'Si sale, dilo con calma y sin reclamo' : ''});
+  var pd = state.pedidos[0];
+  if(pd) add({et:'Ella te pidió', t:pd.texto});
+  var fc = fechasTodas().filter(enVentana)[0];
+  if(fc) add({et:'Ya viene', t:fc.titulo, s:faltanTxt(fc.faltan)});
+  var g = gestoActual();
+  if(!g.hecho && !(fc && g.porque === 'Fecha cercana')) add({et:'Un gesto para hoy', t:g.texto});
+  add({et:'Lista', t:'Ve y quiérela bonito.', fin:true});
+  return out;
+}
+function renderHist(){
+  var hs = ui.hist, box = $('#historia'); if(!box) return;
+  if(!hs){ box.innerHTML = ''; document.documentElement.style.overflow = ''; return; }
+  var x = hs.slides[hs.i];
+  box.innerHTML = '<div class="hist-v g-' + x.col + '" role="dialog" aria-modal="true" aria-label="Antes de verla">' +
+    '<div class="hist-bar" aria-hidden="true">' + hs.slides.map(function(o, j){ return '<i class="' + (j < hs.i ? 'lleno' : j === hs.i ? 'act' : '') + '"><b></b></i>'; }).join('') + '</div>' +
+    '<button class="hist-x" data-a="hist-cerrar" aria-label="Cerrar">' + I.x + '</button>' +
+    '<button class="hist-zona izq" data-a="hist-ant" aria-label="Anterior"></button><button class="hist-zona der" data-a="hist-sig" aria-label="Siguiente"></button>' +
+    '<div class="hist-c" aria-live="polite">' + (x.foto ? '<img class="hist-foto" alt="" src="' + esc(fotoSrc(x.foto)) + '">' : '') +
+      '<p class="hist-et">' + esc(x.et) + '</p><p class="hist-t">' + esc(x.t) + '</p>' + (x.s ? '<p class="hist-s">' + esc(x.s) + '</p>' : '') +
+      (x.fin ? '<button class="b hist-fin" data-a="hist-cerrar">Lista</button>' : '') + '</div>' +
+    '<p class="hist-pie">' + (hs.i + 1) + ' de ' + hs.slides.length + '</p></div>';
+  document.documentElement.style.overflow = 'hidden';
+  var bar = box.querySelector('.hist-bar i.act b');
+  if(bar && !x.fin && !sinMov()) bar.addEventListener('animationend', function(){ if(ui.hist === hs) histMover(1); });
+  var fin = box.querySelector('.hist-fin'); if(fin) fin.focus(); else { var cx = box.querySelector('.hist-x'); if(cx && document.activeElement && !box.contains(document.activeElement)) cx.focus(); }
+}
+function histMover(d){
+  var hs = ui.hist; if(!hs) return;
+  var n = hs.i + d;
+  if(n < 0) n = 0;
+  if(n >= hs.slides.length){ cerrarHist(); return; }
+  hs.i = n; renderHist();
+}
+function cerrarHist(){ var vuelta = ui.hist && ui.hist.de; ui.hist = null; renderHist(); var b = vuelta && $(vuelta); if(b) b.focus(); }
+
+/* ---------- mazo de gestos ---------- */
+function mazo(){
+  var tengo = state.rituales.map(function(x){ return x.nombre.toLowerCase(); }), out = [];
+  CATALOGO.forEach(function(c){ c.g.forEach(function(g){
+    if(tengo.indexOf(g[0].toLowerCase()) < 0 && ui.pasados.indexOf(g[0]) < 0) out.push({t:g[0], cada:g[1], eje:CAT_EJE[c.id], cat:c.n});
+  }); });
+  return mezclar(out, rng('mazo' + iso(hoy())));
+}
+function vistaMazo(){
+  var m = mazo();
+  if(!m.length) return '<div class="deck"><p class="deck-fin">ya viste todos los gestos</p></div>';
+  var top = m.slice(0, 3);
+  return '<div class="deck" aria-live="polite">' + top.map(function(g, i){
+      return '<div class="dk g-' + EJE_COL[g.eje] + '" data-pos="' + i + '"' + (i ? ' aria-hidden="true"' : '') + ' data-t="' + esc(g.t) + '">' +
+        '<span class="dk-si">Lo quiero</span><span class="dk-no">Paso</span>' +
+        '<span class="dk-e">' + esc(g.cat) + '</span><p class="dk-t">' + esc(g.t) + '</p><p class="dk-m">' + mayus(ritmoTxt(g.cada)) + '</p></div>';
+    }).reverse().join('') + '</div>' +
+    '<div class="deck-b"><button class="redondo no" data-a="deck-no" aria-label="Pasar">' + I.x + '</button>' +
+      '<button class="b b-sec" data-a="deck-hoy">Lo hago hoy</button>' +
+      '<button class="redondo si" data-a="deck-si" aria-label="Agregar a mis gestos">' + I.cora + '</button></div>';
+}
+function cartaArriba(){ return $('.dk[data-pos="0"]'); }
+function lanzar(dir, luego){
+  var c = cartaArriba();
+  if(!c || sinMov()){ luego(); return; }
+  c.classList.remove('arrastra');
+  c.style.transform = 'translate(' + (dir * 520) + 'px,-30px) rotate(' + (dir * 28) + 'deg)';
+  c.style.opacity = '0';
+  setTimeout(luego, 240);
+}
+function mazoAccion(tipo){
+  var c = cartaArriba(); if(!c) return;
+  var t = c.getAttribute('data-t'), g = mazo().filter(function(x){ return x.t === t; })[0]; if(!g) return;
+  if(tipo === 'si'){
+    lanzar(1, function(){
+      state.rituales.push({id:uid(), nombre:g.t, cada:g.cada, ultimo:'', cat:g.eje});
+      guardar(); render(); burst(false); toast('Agregado a mis gestos');
+    });
+  } else if(tipo === 'hoy'){
+    lanzar(1, function(){
+      ui.pasados.push(g.t); anotar(g.eje, 'mazo'); guardar(); render(); burst(false); toast('¡Eso! Anotado para hoy');
+    });
+  } else {
+    lanzar(-1, function(){ ui.pasados.push(g.t); render(); });
+  }
+}
+var drag = null;
+document.addEventListener('pointerdown', function(e){
+  var c = e.target.closest && e.target.closest('.dk[data-pos="0"]');
+  if(c){ drag = {c:c, x:e.clientX, y:e.clientY, dx:0}; c.classList.add('arrastra'); try{ c.setPointerCapture(e.pointerId); }catch(er){} return; }
+  var hv = e.target.closest && e.target.closest('.hist-v');
+  if(hv){ ui.histHold = false; hv._t = setTimeout(function(){ ui.histHold = true; hv.classList.add('pausa'); }, 280); }
+});
+document.addEventListener('pointermove', function(e){
+  if(!drag) return;
+  drag.dx = e.clientX - drag.x; var dy = (e.clientY - drag.y) * .3;
+  drag.c.style.transform = 'translate(' + drag.dx + 'px,' + dy + 'px) rotate(' + (drag.dx / 18) + 'deg)';
+  var si = drag.c.querySelector('.dk-si'), no = drag.c.querySelector('.dk-no');
+  if(si) si.style.opacity = Math.max(0, Math.min(1, drag.dx / 90));
+  if(no) no.style.opacity = Math.max(0, Math.min(1, -drag.dx / 90));
+});
+function soltar(){
+  if(!drag) return;
+  var d = drag; drag = null;
+  if(Math.abs(d.dx) > 95){ mazoAccion(d.dx > 0 ? 'si' : 'no'); }
+  else { d.c.classList.remove('arrastra'); d.c.style.transform = ''; [].forEach.call(d.c.querySelectorAll('.dk-si,.dk-no'), function(x){ x.style.opacity = 0; }); }
+}
+document.addEventListener('pointerup', function(e){
+  soltar();
+  var hv = $('.hist-v'); if(hv){ clearTimeout(hv._t); hv.classList.remove('pausa'); }
+});
+document.addEventListener('pointercancel', function(){ soltar(); var hv = $('.hist-v'); if(hv){ clearTimeout(hv._t); hv.classList.remove('pausa'); } });
+
+/* ---------- pregúntale a Nov ---------- */
+var sampleNS = null, coachCtl = null;
+var COACH_RAPIDO = ['Está estresada y no sé cómo ayudarla','Nos peleamos y no sé cómo arreglarlo','Quiero sorprenderla esta semana','Siento que estamos un poco distantes'];
+function contextoNov(){
+  var L = [];
+  var ini = parse(state.inicio); if(ini) L.push('Juntas desde: ' + iso(ini));
+  var cum = state.fechas.filter(function(f){ return f.nacio; })[0]; if(cum) L.push('Cumpleaños de María: ' + cum.fecha);
+  if(state.amor.length) L.push('Se siente querida con: ' + state.amor.map(function(id){ return (amorDe(id) || {n:id}).n; }).join(', '));
+  CATS.forEach(function(c){
+    var ns = state.notas.filter(function(n){ return n.cat === c.id; }).slice(0, 12);
+    if(ns.length) L.push(c.nombre + ': ' + ns.map(function(n){ return (n.lugar ? n.lugar + ' - ' : '') + n.texto; }).join('; '));
+  });
+  if(state.vidaExtra.length) L.push('Cosas que me ha contado: ' + state.vidaExtra.slice(0, 20).map(function(x){ return x.t; }).join('; '));
+  state.manual.forEach(function(m){
+    var p = [];
+    if(m.ayuda.length) p.push('la ayuda: ' + m.ayuda.map(function(i){ return i.t; }).join(', '));
+    if(m.evitar.length) p.push('evitar: ' + m.evitar.map(function(i){ return i.t; }).join(', '));
+    if(m.frases.length) p.push('funciona: ' + m.frases.map(function(i){ return i.t; }).join(', '));
+    if(p.length) L.push('Cuando está ' + m.nombre.toLowerCase() + ', ' + p.join('; '));
+  });
+  if(state.semana.length) L.push('Lo que trae estos días: ' + state.semana.map(function(x){ return x.texto + (x.fecha ? ' (' + x.fecha + ')' : ''); }).join('; '));
+  var tp = state.temas.filter(function(x){ return !x.hablado; }); if(tp.length) L.push('Temas que tengo pendientes de hablar: ' + tp.map(function(x){ return x.texto; }).join('; '));
+  if(state.pedidos.length) L.push('Cosas que me ha pedido: ' + state.pedidos.map(function(x){ return x.texto; }).join('; '));
+  var ac = state.aprend.filter(function(a){ return a.acuerdo; }).slice(0, 6); if(ac.length) L.push('Acuerdos de discusiones pasadas: ' + ac.map(function(a){ return a.acuerdo; }).join('; '));
+  if(state.focos.length) L.push('En qué quiero mejorar: ' + state.focos.map(function(f){ return f.texto; }).join('; '));
+  var fx = fechasTodas().filter(function(f){ return f.faltan >= 0; }).slice(0, 3); if(fx.length) L.push('Próximas fechas: ' + fx.map(function(f){ return f.titulo + ' en ' + f.faltan + ' días'; }).join('; '));
+  return L.join('\n').slice(0, 7000);
+}
+function vistaCoach(){
+  if(!sampleNS) return '';
+  return '<section class="tarjeta coach"><div class="coach-top"><span class="coach-i" aria-hidden="true">' + I.chispa + '</span>' +
+      '<div><h2>Pregúntale a Nov</h2><p class="meta">Con todo lo que sé de María</p></div></div>' +
+    '<div class="chips">' + COACH_RAPIDO.map(function(q){ return '<button class="chip" data-a="coach-rapido" data-v="' + esc(q) + '">' + esc(q) + '</button>'; }).join('') + '</div>' +
+    '<textarea class="campo" id="coach-q" maxlength="600" placeholder="¿Qué está pasando?" aria-label="¿Qué está pasando?">' + esc(ui.coachQ) + '</textarea>' +
+    '<div class="hoja-b" style="margin-top:10px">' + (ui.coachOn ? '<button class="b b-sec" data-a="coach-stop">Detener</button>' : '<button class="b b-pri" data-a="coach-ir">Pedir consejo</button>') + '</div>' +
+    (ui.coachR || ui.coachOn ? '<div class="coach-r' + (ui.coachOn && !ui.coachR ? ' pensando' : '') + '" aria-live="polite">' + (ui.coachR ? esc(ui.coachR) : 'Pensando') + '</div>' : '') +
+    '</section>';
+}
+function pedirConsejo(){
+  var q = val('#coach-q'); ui.coachQ = q;
+  if(!q){ var tq = $('#coach-q'); if(tq) tq.focus(); return; }
+  if(!sampleNS || ui.coachOn) return;
+  var prompt = 'Eres Nov, una guía cálida, práctica y honesta dentro de una app privada. Quien te escribe es una mujer que quiere ser mejor novia para María; llevan casi tres años juntas.\n' +
+    'Responde en español de México, hablándole de tú, en texto simple: sin markdown, sin asteriscos ni títulos. Máximo 130 palabras.\n' +
+    'Formato: una frase corta que entienda la situación, y luego 3 pasos concretos numerados (1., 2., 3.). Usa lo que está anotado de María cuando ayude, con detalles específicos. ' +
+    'Sé honesta: si ella tiene parte de responsabilidad, díselo con cariño. No inventes datos de María que no estén anotados. Si hay señales de violencia o de que alguien está en riesgo, recomiéndale buscar ayuda profesional.\n\n' +
+    'Lo que tiene anotado de María:\n' + (contextoNov() || '(todavía nada)') + '\n\nLo que está pasando ahora:\n' + q;
+  coachCtl = new AbortController(); ui.coachOn = true; ui.coachR = ''; render();
+  sampleNS(prompt, {signal:coachCtl.signal, cache:false, onText:function(u){
+    ui.coachR = u.text; var el = $('.coach-r'); if(el){ el.classList.remove('pensando'); el.textContent = u.text; }
+  }}).then(function(r){ ui.coachR = r.text; }, function(e){
+    var c = e && e.code;
+    ui.coachR = (e && e.text) || '';
+    if(c === 'not_granted' || c === 'sampling_disabled' || c === 'not_declared' || c === 'capability_disabled' || c === 'capability_removed'){ sampleNS = null; toast('Nov no puede contestar aquí'); }
+    else if(c === 'rate_limited') toast('Espera tantito y vuelve a intentar');
+    else if(c === 'refused'){ ui.coachR = ''; toast('No pude contestar eso, intenta contarlo distinto'); }
+    else if(c !== 'cancelled') toast('No se pudo, intenta otra vez');
+  }).then(function(){ ui.coachOn = false; coachCtl = null; if(ui.tab === 'guias' && !ui.hoja) render(); });
+}
+
 /* ---------- vistas ---------- */
 function render(){
   var app = $('#app');
@@ -1452,6 +1711,8 @@ function vistaHoy(){
   var cab = '<p class="fecha-hoy">' + esc(fechaCorta(t)) + '</p><h1 class="titulo">' + saludo() + '</h1>';
 
   var g = gestoActual(), rev = state.revelado === k || g.hecho, col = EJE_COL[g.cat] || 'rosa';
+  h += '<button class="hist-btn" data-a="historia"><span class="hist-ring">' + (state.fotoMaria ? '<img alt="" src="' + esc(fotoSrc(state.fotoMaria)) + '">' : '<span>M</span>') + '</span>' +
+    '<span><b>Antes de verla</b><span class="meta">Lo que tienes que saber hoy</span></span><span class="play">' + I.play + '</span></button>';
   h += '<section class="flip' + (rev ? ' volteada' : '') + '" aria-label="Gesto de hoy"><div class="flip-in">' +
     '<button class="cara frente" data-a="revelar"' + (rev ? ' inert' : '') + '><span class="frente-i">' + I.chispa + '</span><b>Tu gesto de hoy</b><span>Toca para verlo</span></button>' +
     '<div class="cara atras gesto g-' + col + (g.hecho ? ' hecho' : '') + '"' + (rev ? '' : ' inert') + '>' +
@@ -1904,9 +2165,10 @@ function crecerHabitos(){
     }).join('') + '</div>';
   }
   h += '<button class="captura" data-a="ritual">' + I.mas + '<span>Nuevo gesto</span></button>';
+  h += sec('Descubre gestos') + vistaMazo();
   var tengo = state.rituales.map(function(x){ return x.nombre.toLowerCase(); });
   var cat = CATALOGO.filter(function(c){ return c.id === ui.catG; })[0] || CATALOGO[0];
-  h += sec('Más gestos', CATALOGO.reduce(function(n, c){ return n + c.g.length; }, 0)) +
+  h += sec('Todos los gestos', CATALOGO.reduce(function(n, c){ return n + c.g.length; }, 0)) +
     '<div class="chips">' + CATALOGO.map(function(c){
       return '<button class="chip chip-c" style="--c:var(--k-' + CAT_EJE[c.id] + ')" data-a="cat-g" data-v="' + c.id + '" aria-pressed="' + (c.id === cat.id) + '">' + c.n + '</button>';
     }).join('') + '</div>' +
@@ -1985,7 +2247,7 @@ function vistaGuias(){
     return '<button class="tarjeta guia g-' + ({pausa:'lila', disculpa:'rosa', dificil:'cielo'}[a] || 'coral') + '" data-a="' + a + '"><span class="ico" aria-hidden="true">' + icono + '</span>' +
       '<span><b>' + titulo + '</b></span>' + I.flecha + '</button>';
   }
-  var h = guia('pausa', 'Antes de contestar', 'abrir cuando estemos peleando o yo esté enojada', I.guia) +
+  var h = vistaCoach() + guia('pausa', 'Antes de contestar', 'abrir cuando estemos peleando o yo esté enojada', I.guia) +
     guia('disculpa', 'Disculparme bien', 'tres frases y sale la disculpa. sin peros', I.cora) +
     guia('dificil', 'Decir algo difícil', 'para decir lo que me molesta sin que suene a reclamo', I.chat);
   h += sec('Generador de citas') + mi('cuando no se me ocurre nada: le pico y sale un plan completo') + vistaGenerador();
@@ -2365,6 +2627,16 @@ function accion(a, el){
       state = normalize(crudo); state.bienvenida = true;
       guardar(); cerrarHoja(); render(); toast('Datos cargados'); break;
     case 'crecer-sub': ui.crecer = v; ui.anim = true; render(); break;
+    case 'historia': ui.hist = {i:0, slides:historias(), de:'[data-a="historia"]'}; renderHist(); break;
+    case 'hist-sig': if(ui.histHold){ ui.histHold = false; break; } histMover(1); break;
+    case 'hist-ant': if(ui.histHold){ ui.histHold = false; break; } histMover(-1); break;
+    case 'hist-cerrar': cerrarHist(); break;
+    case 'deck-si': mazoAccion('si'); break;
+    case 'deck-no': mazoAccion('no'); break;
+    case 'deck-hoy': mazoAccion('hoy'); break;
+    case 'coach-rapido': var cq = $('#coach-q'); if(cq){ cq.value = v; ui.coachQ = v; cq.focus(); } break;
+    case 'coach-ir': pedirConsejo(); break;
+    case 'coach-stop': if(coachCtl) coachCtl.abort(); break;
     case 'revelar':
       state.revelado = k; guardar();
       var fl = $('.flip'); if(fl){ fl.classList.add('volteada'); var fr = fl.querySelector('.frente'), at = fl.querySelector('.atras'); if(fr) fr.setAttribute('inert', ''); if(at){ at.removeAttribute('inert'); } }
@@ -2700,6 +2972,7 @@ document.addEventListener('click', function(e){
 });
 var vidaT = null;
 document.addEventListener('input', function(e){
+  if(e.target && e.target.id === 'coach-q'){ ui.coachQ = e.target.value; return; }
   if(e.target && e.target.getAttribute && e.target.getAttribute('data-buscar') === 'vida'){
     var q = e.target.value.trim().toLowerCase(), vis = 0;
     [].forEach.call(document.querySelectorAll('.vida-l .fila'), function(f){
@@ -2742,6 +3015,11 @@ document.addEventListener('change', function(e){
   if(c === 'chequeo-cada'){ state.chequeo.cada = +e.target.value || 14; guardar(); render(); }
 });
 document.addEventListener('keydown', function(e){
+  if(ui.hist){
+    if(e.key === 'Escape'){ cerrarHist(); return; }
+    if(e.key === 'ArrowRight'){ histMover(1); return; }
+    if(e.key === 'ArrowLeft'){ histMover(-1); return; }
+  }
   if(e.key === 'Escape' && ui.hoja){ cerrarHoja(); return; }
   if(e.key === 'Enter' && e.target && e.target.getAttribute && e.target.getAttribute('data-enter') && !e.isComposing){
     e.preventDefault();
@@ -2759,6 +3037,7 @@ var espera = new Promise(function(res){ setTimeout(res, 2500); });
 var conexion = conectar();
 if(window.claude && typeof window.claude.use === 'function'){
   window.claude.use('assets').then(function(a){ assetsNS = a; }).catch(function(){});
+  window.claude.use('sample').then(function(f){ sampleNS = f; if(f && ui.tab === 'guias' && !ui.hoja && ui.listo) render(); }).catch(function(){});
 }
 Promise.race([conexion, espera]).then(function(){ ui.listo = true; ui.anim = true; render(); });
 conexion.then(function(){ if(ui.listo && !ui.hoja) render(); });
