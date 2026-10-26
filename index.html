@@ -2622,7 +2622,7 @@ function hojaAmor(){
     '<p class="apoyo" style="margin:-8px 0 6px">Que ella le ponga a cada una del 1 (poco) al 5 (muchísimo)</p>' +
     AMOR.map(function(a){
       var v = amorPunt(null, a.id);
-      return '<div class="punt" role="group" aria-label="' + a.n + '"><b>' + a.n + '</b><span>' + a.d + '</span>' +
+      return '<div class="punt" role="group" aria-label="' + a.n + '"><b>' + a.n + '</b>' +
         '<div class="punt-b">' + [1,2,3,4,5].map(function(n){
           return '<button data-a="amor-op" data-v="' + a.id + '" data-n="' + n + '" aria-pressed="' + (v === n) + '" aria-label="' + n + ' de 5">' + n + '</button>';
         }).join('') + '</div><div class="punt-esc"><span>Poco</span><span>Muchísimo</span></div></div>';
