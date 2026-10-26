@@ -1810,7 +1810,7 @@ function pedirConsejo(){
 function render(){
   var app = $('#app');
   if(!ui.listo){ app.innerHTML = '<div class="cargando"><p>Abriendo mi cuaderno…</p></div>'; return; }
-  if(!state.bienvenida){ app.innerHTML = vistaBienvenida(); return; }
+  if(!state.bienvenida){ if(!state.manual.length) state.manual = situacionesBase(); state.bienvenida = true; ui.anim = true; guardar(); }
   var v = ui.tab === 'maria' ? vistaMaria() : ui.tab === 'crecer' ? vistaCrecer() : ui.tab === 'guias' ? vistaGuias() : ui.tab === 'fechas' ? vistaFechas() : vistaHoy();
   app.innerHTML =
     '<header class="top"><div class="marca">Nov</div>' +
