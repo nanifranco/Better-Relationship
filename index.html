@@ -826,6 +826,13 @@ body{background:var(--bg)}
 /* barra inferior */
 .tab{font-weight:600}
 .tab[aria-current="page"] .tab-i{background:var(--accent-soft);animation:none}
+/* guías y manual en una sola lista */
+.sit{border-radius:20px}
+.sit-b{min-height:80px;padding:16px 12px 16px 16px;gap:14px;font-weight:600;font-size:1rem}
+.sit-b .ico{width:48px;height:48px;flex:none}
+.sit-b .ico svg{width:48px;height:48px}
+.gen-ya{display:inline-flex;align-items:center;gap:6px;cursor:default;background:rgba(255,255,255,.2)!important;color:#FFFFFF!important}
+.gen .rot{margin-top:14px}
 /* preguntas */
 .preg-azar{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin-bottom:12px;background:color-mix(in srgb,#22A699 12%,var(--surface));border:0}
 .preg-azar[disabled]{opacity:.5}
@@ -1152,7 +1159,7 @@ function normalize(o){
 function copia(o){ return JSON.parse(JSON.stringify(o)); }
 
 var state = normalize(null);
-var ui = {hist:null, histHold:false, pasados:[], coachQ:'', coachR:'', coachOn:false, anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genModo:'sorpresa', genVistos:[], tab:'hoy', sub:'preguntas', pregCat:'esto', vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
+var ui = {hist:null, histHold:false, pasados:[], coachQ:'', coachR:'', coachOn:false, anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genModo:'sorpresa', genVistos:[], tab:'hoy', sub:'preguntas', pregCat:'esto', pq:null, pqModo:'sorpresa', pqTipo:'esto', pqVistos:[], gg:null, ggModo:'sorpresa', ggTipo:'todas', ggVistos:[], vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
 var docRef = null, habiaLocal = false;
 var saveTimer = null, escribiendo = false, pendiente = false;
 
@@ -1463,67 +1470,16 @@ function hayEjemplos(){
 }
 
 function gestos(){
-  var t = hoy(), r = rng(iso(t));
-  var urg = [], prio = [], pers = [];
-  var pend = regalosPendientes();
-  fechasTodas().forEach(function(f){
-    if(!enVentana(f)) return;
-    var g = {
-      texto: f.faltan === 0 ? f.titulo + ': es hoy. Que se note desde el primer mensaje.'
-           : f.titulo + ': ' + faltanTxt(f.faltan).toLowerCase() + '. Adelanta algo hoy.',
-      extra: pend ? 'Tengo ' + plural(pend, 'idea de regalo guardada', 'ideas de regalo guardadas') + '.' : 'Todavía no tengo ideas de regalo guardadas.',
-      porque: 'Fecha cercana'
-    };
-    if(f.faltan <= 2 || f.faltan === f.aviso || f.faltan % 4 === 0) urg.push(g); else prio.push(g);
+  var r = rng(iso(hoy())), mios = [], resto = [];
+  gestosPool('todas').forEach(function(g){ (g.mio ? mios : resto).push(g); });
+  mios = mezclar(mios, r).sort(function(a, b){
+    return ritualEstado(buscar(state.rituales, b.ritual)).frac - ritualEstado(buscar(state.rituales, a.ritual)).frac;
   });
-  state.semana.forEach(function(s){
-    var d = parse(s.fecha), n = d ? dias(t, d) : null;
-    if(n === 0) urg.push({texto:'Hoy le toca esto. Mándale ánimo antes y pregúntale después cómo le fue.', cita:s.texto, porque:'Lo que trae María'});
-    else if(n === 1) urg.push({texto:'Mañana le toca esto. Pregúntale hoy si necesita algo.', cita:s.texto, porque:'Lo que trae María'});
-    else if(n !== null && n < 0) prio.push({texto:'Esto ya pasó. Pregúntale cómo le fue y escucha la respuesta completa.', cita:s.texto, porque:'Lo que trae María'});
-    else prio.push({texto:'Dale seguimiento a lo que trae encima: pregúntale cómo va.', cita:s.texto, porque:'Lo que trae María'});
+  return mios.concat(mezclar(resto, r)).map(function(g){
+    var e = g.mio ? ritualEstado(buscar(state.rituales, g.ritual)) : null;
+    return {texto:g.t, cat:g.eje, ritual:g.ritual,
+      porque: g.mio ? (e.dias === null ? 'Mis gestos' : e.dias === 0 ? 'Hoy' : 'Hace ' + plural(e.dias, 'día', 'días')) : EJE_N[g.eje]};
   });
-  if(chequeoEstado().toca) prio.push({texto:'Toca chequeo con María. Proponle un día para sentarse a platicar cómo van.', porque:'Chequeo'});
-  state.temas.forEach(function(x){
-    if(x.hablado) return;
-    var dt = parse(x.fecha), n = dt ? dias(dt, t) : 0;
-    if(x.tipo === 'bonito') pers.push({texto:'Dile hoy esto que tenías guardado.', cita:x.texto, porque:'Pendiente de decirle'});
-    else if(x.urge === 'pronto' || n >= 10) prio.push({texto:'Llevas ' + plural(n, 'día', 'días') + ' con esto pendiente. Búscale un momento tranquilo para platicarlo.', cita:x.texto, porque:'Pendiente de hablar'});
-  });
-  state.pedidos.forEach(function(p){
-    prio.push({texto:'María te lo pidió. Hazlo hoy sin que te lo recuerde.', cita:p.texto, porque:'Me lo pidió'});
-  });
-  state.valoro.filter(function(x){ return !x.dicho; }).slice(0, 5).forEach(function(x){
-    pers.push({texto:'Dile hoy esto que valoras de ella, con tus palabras.', cita:x.texto, porque:'Lo que valoro'});
-  });
-  state.respuestas.forEach(function(x){
-    if(x.cat === 'querer' && x.a) prio.push({texto:'Hazlo como ella te dijo.', cita:x.a, porque:'Me respondió'});
-  });
-  state.aprend.forEach(function(a){
-    if(a.acuerdo) pers.push({texto:'Ten presente lo que acordaron la última vez.', cita:a.acuerdo, porque:'De mis aprendizajes'});
-  });
-  state.amor.forEach(function(id){
-    var a = amorDe(id); if(!a) return;
-    (IDEAS_AMOR[id] || []).forEach(function(tx){ pers.push({texto:tx, porque:'Se siente querida con ' + a.n.toLowerCase(), cat:id}); });
-  });
-  state.notas.forEach(function(n){
-    if(n.cat === 'gustos') pers.push({texto:'Hazle un detalle con algo que le gusta.', cita:n.texto, porque:'De mis fichas'});
-    else if(n.cat === 'ordenes' && n.lugar) pers.push({texto:'Sorpréndela con su orden de ' + n.lugar + '.', cita:n.texto, porque:'De mis fichas'});
-    else if(n.cat === 'comida') pers.push({texto:'Consiéntela con algo que se le antoje.', cita:n.texto, porque:'De mis fichas'});
-    else if(n.cat === 'dijo') pers.push({texto:'Retoma algo que te contó y pregúntale cómo va.', cita:n.texto, porque:'De mis fichas'});
-    else if(n.cat === 'suenos') pers.push({texto:'Apoya uno de sus sueños: pregúntale qué sigue y cómo puedes ayudar.', cita:n.texto, porque:'De mis fichas'});
-  });
-  state.manual.forEach(function(m){
-    m.ayuda.forEach(function(i){
-      pers.push({texto:'Si hoy la notas ' + m.nombre.toLowerCase() + ', haz lo que sabes que la ayuda.', cita:i.t, porque:'De su manual'});
-    });
-  });
-  prio = mezclar(prio, r); pers = mezclar(pers, r);
-  var gen = mezclar(GENERICOS, r).map(function(tx){ return {texto:tx}; });
-  var out = urg.slice(), n = Math.max(prio.length, pers.length, gen.length);
-  for(var i=0;i<n;i++){ if(prio[i]) out.push(prio[i]); if(pers[i]) out.push(pers[i]); if(gen[i]) out.push(gen[i]); }
-  out.forEach(function(g){ if(!g.cat) g.cat = PORQUE_EJE[g.porque] || clasificar(g.texto); });
-  return out;
 }
 
 function clasificar(t){
@@ -1600,6 +1556,16 @@ function girar(){
   var it = setInterval(function(){
     vueltas++;
     el.textContent = ACTIVIDADES[Math.floor(Math.random() * ACTIVIDADES.length)][0];
+    if(vueltas >= 11){ clearInterval(it); el.textContent = fin; el.classList.remove('gira'); el.classList.add('cae'); }
+  }, 65);
+}
+function girarEn(sel, otro){
+  var el = $(sel); if(!el || sinMov()) return;
+  var fin = el.textContent, vueltas = 0;
+  el.classList.add('gira');
+  var it = setInterval(function(){
+    vueltas++;
+    el.textContent = otro() || fin;
     if(vueltas >= 11){ clearInterval(it); el.textContent = fin; el.classList.remove('gira'); el.classList.add('cae'); }
   }, 65);
 }
@@ -1869,7 +1835,7 @@ function vistaBienvenida(){
 function gestoActual(){
   var v = state.hechos[iso(hoy())];
   if(v && typeof v === 'object' && v.x) return {texto:v.x, cita:v.c, porque:v.p, cat:v.k || clasificar(v.x), hecho:true};
-  var lista = gestos(), g = lista[ui.offset % lista.length];
+  var lista = gestos(); if(!lista.length) return {texto:'Agrega un gesto en Crecer', cat:'palabras', hecho:false}; var g = lista[ui.offset % lista.length];
   return {texto:g.texto, cita:g.cita, extra:g.extra, porque:g.porque, ritual:g.ritual, cat:g.cat, hecho:!!v};
 }
 
@@ -2019,20 +1985,23 @@ function pregLista(cat){
 }
 function respuestaDe(q){ for(var i=0;i<state.respuestas.length;i++) if(state.respuestas[i].q === q) return state.respuestas[i]; return null; }
 function vistaPreguntas(){
-  var cat = ui.pregCat, lista = pregLista(cat);
-  var pend = lista.filter(function(x){ return !respuestaDe(x.q); });
-  var h = '<div class="chips">' + PREG_CATS.map(function(c){
-    return '<button class="chip" data-a="preg-cat" data-v="' + c[0] + '" aria-pressed="' + (cat === c[0]) + '">' + c[1] + '</button>';
+  var h = genCaja({modo:ui.pqModo, modoA:'pq-modo', ir:'pq', hay:!!ui.pq, cara:blob('circulo', '#22A699'),
+    filtros:'<span class="rot">Tipo</span>' + chipsDe('pq-tipo', ui.pqTipo, PREG_CATS)});
+  if(ui.pq){
+    var r0 = respuestaDe(ui.pq);
+    h += '<section class="tarjeta gen-r g-menta" aria-live="polite"><p class="rev-l">' + catNom(catDe(ui.pq)) + '</p>' +
+      '<p class="gen-plan">' + esc(ui.pq) + '</p>' + (r0 ? '<div class="gen-l"><span>Ya respondió</span><p>' + esc(r0.a) + '</p></div>' : '') +
+      '<div class="hoja-b" style="margin-top:6px"><button class="b b-pri" data-a="preg-abrir" data-v="' + esc(ui.pq) + '">' + (r0 ? 'Cambiar respuesta' : 'Anotar su respuesta') + '</button></div></section>';
+  }
+  h += sec('Mis preguntas', state.pregMias.length);
+  if(state.pregMias.length) h += '<div class="lista">' + state.pregMias.map(function(x){
+    var r1 = respuestaDe(x.q);
+    return '<div class="fila"><button class="fila-c preg-q" data-a="preg-abrir" data-v="' + esc(x.q) + '"><p class="nota-x">' + esc(x.q) + '</p>' +
+      (r1 ? '<p class="meta">Respondida</p>' : '') + '</button>' +
+      '<button class="mini" data-a="del-preg" data-id="' + x.id + '" aria-label="Quitar pregunta">' + I.x + '</button></div>';
   }).join('') + '</div>';
-  h += '<button class="tarjeta preg-azar" data-a="preg-azar"' + (pend.length ? '' : ' disabled') + '><span class="preg-azar-b">' + blob('circulo', '#22A699') + '</span>' +
-    '<span><b>Una al azar</b><span class="meta">' + plural(pend.length, 'pregunta sin responder', 'preguntas sin responder') + '</span></span></button>';
-  if(pend.length) h += '<div class="lista">' + pend.map(function(x){
-    return '<div class="fila"><button class="fila-c preg-q" data-a="preg-abrir" data-v="' + esc(x.q) + '"><p class="nota-x">' + esc(x.q) + '</p></button>' +
-      (x.id ? '<button class="mini" data-a="del-preg" data-id="' + x.id + '" aria-label="Quitar pregunta">' + I.x + '</button>' : '') + '</div>';
-  }).join('') + '</div>';
-  if(cat === 'mias') h += '<div class="agregar"' + (pend.length ? '' : ' style="margin-top:0"') + '><input class="campo" data-foco="preg" data-enter="add-preg" maxlength="160" placeholder="Mi pregunta" aria-label="Mi pregunta">' +
+  h += '<div class="agregar"' + (state.pregMias.length ? '' : ' style="margin-top:0"') + '><input class="campo" data-foco="preg" data-enter="add-preg" maxlength="160" placeholder="Mi pregunta" aria-label="Mi pregunta">' +
     '<button class="b b-sec" data-a="add-preg">Agregar</button></div>';
-  else if(!pend.length) h += '<div class="vacio">' + blob() + '<p>Ya respondió todas</p></div>';
   var resp = state.respuestas.slice().sort(function(a, b){ return (b.fecha || '') > (a.fecha || '') ? 1 : -1; });
   if(resp.length){
     h += sec('Sus respuestas', resp.length) + '<div class="lista">' + resp.map(function(x){
@@ -2091,7 +2060,9 @@ function vistaManual(){
   state.manual.forEach(function(m){
     var abierta = ui.abierta === m.id;
     var total = BLOQUES.reduce(function(s, b){ return s + m[b.id].length; }, 0);
-    h += '<section class="sit"><button class="sit-b" data-a="abrir" data-id="' + m.id + '" aria-expanded="' + abierta + '">' +
+    var mi2 = state.manual.indexOf(m);
+    h += '<section class="sit"><button class="sit-b" data-a="abrir" data-id="' + m.id + '" aria-expanded="' + abierta + '"><span class="ico" aria-hidden="true">' +
+      blob(['penta','flor','rombo','gota','nube','circulo'][mi2 % 6], ['#22A699','#F5A524','#5B7FE0','#F26B4F','#8E63E8','#FF8A3D'][mi2 % 6]) + '</span>' +
       '<span class="sit-n">Cuando está ' + esc(m.nombre.toLowerCase()) + '</span>' +
       (total ? '<span class="cuenta" aria-label="' + plural(total, 'apunte', 'apuntes') + '">' + total + '</span>' : '') + I.flecha + '</button>';
     if(abierta){
@@ -2109,7 +2080,7 @@ function vistaManual(){
     }
     h += '</section>';
   });
-  h += '<div class="agregar" style="margin-top:16px"><input class="campo" data-foco="sit" data-enter="add-sit" placeholder="Otra situación, como nerviosa" aria-label="Nueva situación" maxlength="40">' +
+  h += '<div class="agregar" style="margin-top:12px"><input class="campo" data-foco="sit" data-enter="add-sit" placeholder="Otra guía: cuando está nerviosa" aria-label="Nueva situación" maxlength="40">' +
        '<button class="b b-sec" data-a="add-sit">Agregar</button></div>';
   return h;
 }
@@ -2312,7 +2283,7 @@ function crecerHablar(t){
 }
 
 function crecerHabitos(){
-  var h = '';
+  var h = vistaGenGesto() + sec('Mis gestos', state.rituales.length);
   if(!state.rituales.length){
     h += '<div class="vacio" style="margin-top:0">' + blob() + '<p>Nada todavía</p></div>';
   } else {
@@ -2358,6 +2329,74 @@ function crecerAprend(){
 }
 
 function elegir(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+/* ---------- generadores (citas, gestos, preguntas) ---------- */
+function genCaja(o){
+  var perso = o.modo === 'perso';
+  return '<div class="tarjeta gen"><div class="gen-cara">' + o.cara + '</div><div class="seg gen-modo" role="tablist">' +
+    [['sorpresa','Sorpréndeme'],['perso','Personalizada']].map(function(m){
+      return '<button role="tab" data-a="' + o.modoA + '" data-v="' + m[0] + '" aria-selected="' + (o.modo === m[0]) + '">' + m[1] + '</button>';
+    }).join('') + '</div>' + (perso ? o.filtros : '') +
+    '<button class="b b-pri b-ancho" style="margin-top:16px" data-a="' + o.ir + '">' + (perso ? (o.hay ? 'Generar otra' : 'Generar') : (o.hay ? 'Sorpréndeme otra vez' : 'Sorpréndeme')) + '</button></div>';
+}
+function chipsDe(a, valor, opciones){
+  return '<div class="chips env" style="margin-top:4px">' + opciones.map(function(o){
+    return '<button class="chip" data-a="' + a + '" data-v="' + o[0] + '" aria-pressed="' + (valor === o[0]) + '">' + o[1] + '</button>';
+  }).join('') + '</div>';
+}
+
+/* gestos: los mismos en Hoy y en Crecer */
+function gestosPool(eje){
+  var out = [], tengo = {};
+  state.rituales.forEach(function(r){
+    tengo[String(r.nombre).toLowerCase()] = 1;
+    var e = ritualEje(r);
+    if(!eje || eje === 'todas' || e === eje) out.push({t:r.nombre, eje:e, cada:+r.cada || 14, ritual:r.id, mio:true});
+  });
+  CATALOGO.forEach(function(c){ c.g.forEach(function(g){
+    var e = CAT_EJE[c.id];
+    if(tengo[g[0].toLowerCase()]) return;
+    if(!eje || eje === 'todas' || e === eje) out.push({t:g[0], eje:e, cada:g[1], mio:false});
+  }); });
+  return out;
+}
+var EJE_OPC = [['todas','Todos']].concat(EJES.map(function(e){ return [e, EJE_N[e]]; }));
+function vistaGenGesto(){
+  var h = genCaja({modo:ui.ggModo, modoA:'gg-modo', ir:'gg', hay:!!ui.gg, cara:blob('flor', '#FF8A3D'),
+    filtros:'<span class="rot">Tipo</span>' + chipsDe('gg-tipo', ui.ggTipo, EJE_OPC)});
+  if(ui.gg){
+    var g = ui.gg, mio = state.rituales.some(function(r){ return r.nombre.toLowerCase() === g.t.toLowerCase(); });
+    h += '<section class="tarjeta gen-r g-' + (EJE_COL[g.eje] || 'lila') + '" aria-live="polite">' +
+      '<p class="rev-l">' + EJE_N[g.eje] + ', ' + ritmoTxt(g.cada) + '</p><p class="gen-plan">' + esc(g.t) + '</p>' +
+      '<div class="hoja-b" style="margin-top:6px"><button class="b b-sec" data-a="gg-hoy">Lo hice hoy</button>' +
+      (mio ? '<span class="b b-sec gen-ya">' + I.ok + 'En mis gestos</span>' : '<button class="b b-pri" data-a="gg-add">Agregar a mis gestos</button>') + '</div></section>';
+  }
+  return h;
+}
+function generarGesto(){
+  var pool = gestosPool(ui.ggModo === 'perso' ? ui.ggTipo : 'todas');
+  if(!pool.length) return null;
+  var nuevos = pool.filter(function(g){ return ui.ggVistos.indexOf(g.t) < 0; });
+  if(!nuevos.length){ ui.ggVistos = []; nuevos = pool; }
+  var g = elegir(nuevos); ui.ggVistos.push(g.t); return g;
+}
+
+/* preguntas */
+function catDe(q){
+  for(var i=0;i<PREG_CATS.length;i++){ var c = PREG_CATS[i][0]; if(c !== 'mias' && (PREG_BANCO[c] || []).indexOf(q) >= 0) return c; }
+  return 'mias';
+}
+function catNom(c){ for(var i=0;i<PREG_CATS.length;i++) if(PREG_CATS[i][0] === c) return PREG_CATS[i][1]; return ''; }
+function generarPregunta(){
+  var cats = ui.pqModo === 'perso' ? [ui.pqTipo] : ['esto','querer','conocerla','mias'], pool = [];
+  cats.forEach(function(c){ pregLista(c).forEach(function(x){ pool.push(x.q); }); });
+  if(!pool.length) return null;
+  var libres = pool.filter(function(q){ return !respuestaDe(q) && ui.pqVistos.indexOf(q) < 0; });
+  if(!libres.length){ ui.pqVistos = []; libres = pool.filter(function(q){ return !respuestaDe(q); }); }
+  if(!libres.length) libres = pool;
+  var q = elegir(libres); ui.pqVistos.push(q); return q;
+}
+
+
 function genFiltros(){ return ui.genModo === 'perso' ? ui.gf : {donde:'todas', costo:'todas', plan:'todas'}; }
 function costoOk(n){ var f = genFiltros(); return f.costo === 'todas' || n === '?' || +n <= +f.costo; }
 function generarCita(){
@@ -2382,17 +2421,8 @@ function generarCita(){
   return {plan:a[0], comida:c[0], toque:elegir(toques), lugar:lugar, costo:costo, mia:!!a[4], vibe:a[3]};
 }
 function vistaGenerador(){
-  var perso = ui.genModo === 'perso';
-  var h = '<div class="tarjeta gen"><div class="gen-cara">' + blob('nube', '#8E63E8') + '</div><div class="seg gen-modo" role="tablist">' +
-    [['sorpresa','Sorpréndeme'],['perso','Personalizada']].map(function(m){
-      return '<button role="tab" data-a="gen-modo" data-v="' + m[0] + '" aria-selected="' + (ui.genModo === m[0]) + '">' + m[1] + '</button>';
-    }).join('') + '</div>' +
-  (perso ? GEN_F.map(function(f){
-    return '<span class="rot" id="gf-' + f.g + '">' + f.n + '</span><div class="chips env" role="group" aria-labelledby="gf-' + f.g + '">' + f.o.map(function(o){
-      return '<button class="chip" data-a="gen-f" data-g="' + f.g + '" data-v="' + o[0] + '" aria-pressed="' + (ui.gf[f.g] === o[0]) + '">' + o[1] + '</button>';
-    }).join('') + '</div>';
-  }).join('') : '') +
-  '<button class="b b-pri b-ancho" style="margin-top:16px" data-a="gen">' + (perso ? (ui.gen ? 'Generar otra' : 'Generar cita') : (ui.gen ? 'Sorpréndeme otra vez' : 'Sorpréndeme')) + '</button></div>';
+  var h = genCaja({modo:ui.genModo, modoA:'gen-modo', ir:'gen', hay:!!ui.gen, cara:blob('nube', '#8E63E8'),
+    filtros:GEN_F.map(function(f){ return '<span class="rot">' + f.n + '</span>' + chipsDe('gen-f" data-g="' + f.g, ui.gf[f.g], f.o); }).join('')});
   if(ui.gen){
     var g = ui.gen;
     h += '<section class="tarjeta gen-r g-' + ({tranqui:'cielo', romantica:'rosa', aventura:'coral', creativa:'lila'}[g.vibe] || (g.lugar === 'casa' ? 'lila' : 'coral')) + '" aria-live="polite">' +
@@ -2418,6 +2448,7 @@ function vistaGuias(){
   var h = guia('pausa', 'Antes de contestar', '', blob('circulo', '#8E63E8')) +
     guia('disculpa', 'Disculparme bien', '', blob('gota', '#FF8A3D', 'feliz')) +
     guia('dificil', 'Decir algo difícil', '', blob('nube', '#5B7FE0'));
+  h += vistaManual();
   h += sec('Generador de citas') + vistaGenerador();
   h += sec('Mis ideas de cita', state.citas.length);
   if(state.citas.length) h += '<div class="lista">' + state.citas.map(function(c){
@@ -2426,7 +2457,6 @@ function vistaGuias(){
   }).join('') + '</div>';
   h += '<div class="agregar"' + (state.citas.length ? ' style="margin-top:12px"' : ' style="margin-top:0"') + '><input class="campo" data-foco="cita" data-enter="add-cita" placeholder="Una idea mía" aria-label="Nueva idea de cita" maxlength="140">' +
     '<button class="b b-sec" data-a="add-cita">Agregar</button></div>';
-  h += sec('Manual de María') + vistaManual();
   return {cab:cab, cuerpo:h};
 }
 
@@ -2784,6 +2814,31 @@ function accion(a, el){
     case 'sub': ui.sub = v; ui.anim = true; render(); break;
     case 'filtro': ui.filtro = v; render(); break;
     case 'preg-cat': ui.pregCat = v; render(); break;
+    case 'pq-modo': ui.pqModo = v; ui.pq = null; render(); break;
+    case 'pq-tipo': ui.pqTipo = v; render(); break;
+    case 'pq':
+      ui.pq = generarPregunta(); if(!ui.pq) toast('No hay preguntas aquí');
+      render(); girarEn('.gen-r .gen-plan', function(){ var t = generarPregunta(); ui.pqVistos.pop(); return t; });
+      var pqr = $('.gen-r'); if(pqr && pqr.scrollIntoView) pqr.scrollIntoView({block:'nearest', behavior: sinMov() ? 'auto' : 'smooth'});
+      break;
+    case 'gg-modo': ui.ggModo = v; ui.gg = null; render(); break;
+    case 'gg-tipo': ui.ggTipo = v; render(); break;
+    case 'gg':
+      ui.gg = generarGesto(); render();
+      girarEn('.gen-r .gen-plan', function(){ return elegir(gestosPool('todas')).t; });
+      var ggr = $('.gen-r'); if(ggr && ggr.scrollIntoView) ggr.scrollIntoView({block:'nearest', behavior: sinMov() ? 'auto' : 'smooth'});
+      break;
+    case 'gg-hoy':
+      if(!ui.gg) break;
+      var ggR = ui.gg.ritual && buscar(state.rituales, ui.gg.ritual);
+      if(!ggR) ggR = state.rituales.filter(function(r){ return r.nombre.toLowerCase() === ui.gg.t.toLowerCase(); })[0];
+      if(ggR){ ggR.ultimo = k; delete ggR.ejU; }
+      anotar(ui.gg.eje, 'gen'); guardar(); render(); burst(false); toast('Anotado'); break;
+    case 'gg-add':
+      if(!ui.gg) break;
+      if(!state.rituales.some(function(r){ return r.nombre.toLowerCase() === ui.gg.t.toLowerCase(); }))
+        state.rituales.push({id:uid(), nombre:ui.gg.t, cada:ui.gg.cada, ultimo:'', cat:ui.gg.eje});
+      guardar(); render(); toast('Agregado a mis gestos'); break;
     case 'preg-abrir': hojaPregunta(v); break;
     case 'preg-azar':
       var pz = pregLista(ui.pregCat).filter(function(x){ return !respuestaDe(x.q); });
@@ -2795,8 +2850,7 @@ function accion(a, el){
       var prx = respuestaDe(v);
       if(prx){ prx.a = pra; delete prx.ej; }
       else {
-        var pcat = ui.pregCat;
-        PREG_CATS.forEach(function(c){ if(c[0] !== 'mias' && (PREG_BANCO[c[0]] || []).indexOf(v) >= 0) pcat = c[0]; });
+        var pcat = catDe(v);
         state.respuestas.unshift({id:uid(), q:v, a:pra, cat:pcat, fecha:k});
         anotar('tiempo', 'pregunta');
       }
