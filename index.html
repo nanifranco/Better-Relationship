@@ -11,7 +11,7 @@
 :root{
   --bg:#FFFFFF; --surface:#FFFFFF; --text:#111113; --muted:#6B6B73; --line:#EBEBEE; --line2:#D9D9DE; --fill:#F4F4F6;
   --accent:#111113; --accent-fg:#FFFFFF; --accent-soft:#F1F1F3; --accent-text:#111113;
-  --rosa:#CF2D5E; --rosa-soft:#FDECF1;
+  --rosa:#5B3FE0; --rosa-soft:#EEEAFF;
   --grad:#111113; --hero-ink:#111113; --glow:rgba(17,17,19,.25);
   --hero:#111113; --hero-glow:rgba(17,17,19,.4); --hero-borde:transparent;
   --ok:#1C7F54; --ok-soft:#E6F4EC; --danger:#C22E3B; --bar-mid:#D99A2B;
@@ -27,7 +27,7 @@
   :root:not([data-theme="light"]){
     --bg:#0B0B0C; --surface:#151517; --text:#F5F5F7; --muted:#A1A1AA; --line:#26262A; --line2:#36363C; --fill:#1F1F23;
     --accent:#F5F5F7; --accent-fg:#111113; --accent-soft:#232327; --accent-text:#F5F5F7;
-    --rosa:#FF7A9E; --rosa-soft:#3A1622;
+    --rosa:#A08BFF; --rosa-soft:#241E3D;
     --grad:#F5F5F7; --glow:rgba(0,0,0,.6);
     --hero:#1B1B1E; --hero-glow:rgba(0,0,0,.6); --hero-borde:#2E2E33;
     --ok:#5FCB97; --ok-soft:#14301F; --danger:#FF8A92; --bar-mid:#E0A840;
@@ -39,7 +39,7 @@
 :root[data-theme="dark"]{
   --bg:#0B0B0C; --surface:#151517; --text:#F5F5F7; --muted:#A1A1AA; --line:#26262A; --line2:#36363C; --fill:#1F1F23;
   --accent:#F5F5F7; --accent-fg:#111113; --accent-soft:#232327; --accent-text:#F5F5F7;
-  --rosa:#FF7A9E; --rosa-soft:#3A1622;
+  --rosa:#A08BFF; --rosa-soft:#241E3D;
   --grad:#F5F5F7; --glow:rgba(0,0,0,.6);
   --hero:#1B1B1E; --hero-glow:rgba(0,0,0,.6); --hero-borde:#2E2E33;
   --ok:#5FCB97; --ok-soft:#14301F; --danger:#FF8A92; --bar-mid:#E0A840;
@@ -428,29 +428,29 @@ button.stat b{color:var(--text)}
 
 /* ================= Nov 2: color, movimiento y formas nuevas ================= */
 :root{
-  --accent:#E5326A; --accent-fg:#FFFFFF; --accent-soft:#FDE6EE; --accent-text:#C21E58;
-  --grad:linear-gradient(135deg,#FF4D7E,#7B5CFF);
-  --k-palabras:#6A4CFF; --k-tiempo:#1F7AE0; --k-detalles:#E5326A; --k-actos:#0E9F7A; --k-contacto:#F2602E;
-  --fondo-a:rgba(255,77,126,.10); --fondo-b:rgba(123,92,255,.09);
+  --accent:#5B3FE0; --accent-fg:#FFFFFF; --accent-soft:#EEEAFF; --accent-text:#4A2FCC;
+  --grad:linear-gradient(135deg,#2F9BFF,#7B5CFF);
+  --k-palabras:#6A4CFF; --k-tiempo:#1F7AE0; --k-detalles:#E07A00; --k-actos:#0E9F7A; --k-contacto:#F2602E;
+  --fondo-a:rgba(47,155,255,.10); --fondo-b:rgba(123,92,255,.09);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --accent:#FF5C8E; --accent-fg:#2A0714; --accent-soft:#3A1624; --accent-text:#FF8AB1;
-    --k-palabras:#A08BFF; --k-tiempo:#6CB4FF; --k-detalles:#FF7BA3; --k-actos:#4FD6AE; --k-contacto:#FF9D6B;
-    --fondo-a:rgba(255,77,126,.13); --fondo-b:rgba(123,92,255,.14); --grad:linear-gradient(135deg,#FF4D7E,#7B5CFF);
+    --accent:#A08BFF; --accent-fg:#150B33; --accent-soft:#241E3D; --accent-text:#BFAFFF;
+    --k-palabras:#A08BFF; --k-tiempo:#6CB4FF; --k-detalles:#FFA94D; --k-actos:#4FD6AE; --k-contacto:#FF9D6B;
+    --fondo-a:rgba(47,155,255,.13); --fondo-b:rgba(123,92,255,.14); --grad:linear-gradient(135deg,#2F9BFF,#7B5CFF);
   }
 }
 :root[data-theme="dark"]{
-  --accent:#FF5C8E; --accent-fg:#2A0714; --accent-soft:#3A1624; --accent-text:#FF8AB1;
-  --k-palabras:#A08BFF; --k-tiempo:#6CB4FF; --k-detalles:#FF7BA3; --k-actos:#4FD6AE; --k-contacto:#FF9D6B;
-  --fondo-a:rgba(255,77,126,.13); --fondo-b:rgba(123,92,255,.14); --grad:linear-gradient(135deg,#FF4D7E,#7B5CFF);
+  --accent:#A08BFF; --accent-fg:#150B33; --accent-soft:#241E3D; --accent-text:#BFAFFF;
+  --k-palabras:#A08BFF; --k-tiempo:#6CB4FF; --k-detalles:#FFA94D; --k-actos:#4FD6AE; --k-contacto:#FF9D6B;
+  --fondo-a:rgba(47,155,255,.13); --fondo-b:rgba(123,92,255,.14); --grad:linear-gradient(135deg,#2F9BFF,#7B5CFF);
 }
 body{background:radial-gradient(900px 420px at 110% -10%,var(--fondo-a),transparent 60%),radial-gradient(700px 380px at -20% 0%,var(--fondo-b),transparent 60%) no-repeat,var(--bg)}
-.g-rosa{--g1:#E8336D;--g2:#B5338F}
+.g-rosa{--g1:#E07A00;--g2:#C2410C}
 .g-lila{--g1:#6A4CFF;--g2:#A23BE8}
 .g-cielo{--g1:#1F7AE0;--g2:#4B4FE0}
 .g-menta{--g1:#0E9F7A;--g2:#0B7896}
-.g-coral{--g1:#F2602E;--g2:#E5326A}
+.g-coral{--g1:#F2602E;--g2:#D9480F}
 .g-amar{--g1:#E8A300;--g2:#F2602E}
 .marca::before{background:var(--grad)}
 .avatar,.logo{background:var(--grad);color:#FFFFFF}
@@ -476,7 +476,7 @@ main.anim > *{animation:entra .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:
 .cara{grid-area:1/1;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:24px;min-height:248px}
 .atras{transform:rotateY(180deg)}
 .frente{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;color:#FFFFFF;text-align:center;
-  background:radial-gradient(circle at 20% 25%,rgba(255,255,255,.18) 0 2px,transparent 3px) 0 0/34px 34px,linear-gradient(135deg,#2A1650,#6A2C8F 55%,#E8336D);box-shadow:0 18px 34px -18px rgba(106,44,143,.8)}
+  background:radial-gradient(circle at 20% 25%,rgba(255,255,255,.18) 0 2px,transparent 3px) 0 0/34px 34px,linear-gradient(135deg,#2A1650,#4B3CC9 55%,#2F9BFF);box-shadow:0 18px 34px -18px rgba(75,60,201,.8)}
 .frente::after{content:"";position:absolute;top:-30%;left:0;width:40%;height:160%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);animation:brilla 3.2s ease-in-out infinite}
 .frente-i{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.16);display:grid;place-items:center;margin-bottom:6px;animation:late 1.8s ease-in-out infinite}
 .frente-i svg{width:30px;height:30px}
@@ -630,7 +630,7 @@ main.anim .radar .rp{animation:abre .9s cubic-bezier(.2,.9,.3,1.2) both .15s}
 @keyframes llena{to{width:100%}}
 .hist-btn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin-bottom:14px;padding:4px 2px}
 .hist-ring{position:relative;width:64px;height:64px;flex:none;border-radius:50%}
-.hist-ring::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(#FF4D7E,#FFC23D,#7B5CFF,#2F9BFF,#FF4D7E);animation:rota 5s linear infinite}
+.hist-ring::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(#2F9BFF,#FFC23D,#7B5CFF,#2F9BFF,#2F9BFF);animation:rota 5s linear infinite}
 .hist-ring img,.hist-ring span{position:absolute;inset:3px;border-radius:50%;border:2.5px solid var(--bg);object-fit:cover;width:calc(100% - 6px);height:calc(100% - 6px);background:var(--fill);display:grid;place-items:center;font-weight:800;font-size:1.4rem;color:var(--muted)}
 .hist-btn b{display:block;font-size:1.02rem;font-weight:800}
 .hist-btn .meta{margin:0}
@@ -681,10 +681,10 @@ main.anim .radar .rp{animation:abre .9s cubic-bezier(.2,.9,.3,1.2) both .15s}
 .deck-fin{text-align:center;padding:40px 10px;color:var(--muted);font-weight:600}
 
 .coach{margin-bottom:14px;position:relative;overflow:hidden}
-.coach::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:linear-gradient(135deg,#FF4D7E,#7B5CFF,#2F9BFF);
+.coach::before{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1.5px;background:linear-gradient(135deg,#2F9BFF,#7B5CFF,#2F9BFF);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
 .coach-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-.coach-i{width:44px;height:44px;border-radius:14px;flex:none;display:grid;place-items:center;color:#FFFFFF;background:linear-gradient(135deg,#FF4D7E,#7B5CFF);animation:late 2.2s ease-in-out infinite}
+.coach-i{width:44px;height:44px;border-radius:14px;flex:none;display:grid;place-items:center;color:#FFFFFF;background:linear-gradient(135deg,#2F9BFF,#7B5CFF);animation:late 2.2s ease-in-out infinite}
 .coach-i svg{width:22px;height:22px}
 .coach h2{font-size:1.08rem;font-weight:800;letter-spacing:-.02em}
 .coach .chips{margin:0 -16px;padding:2px 16px 12px}
@@ -1010,7 +1010,7 @@ function normalize(o){
 function copia(o){ return JSON.parse(JSON.stringify(o)); }
 
 var state = normalize(null);
-var ui = {hist:null, histHold:false, pasados:[], coachQ:'', coachR:'', coachOn:false, anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genVistos:[], tab:'hoy', sub:'vida', vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
+var ui = {hist:null, histHold:false, pasados:[], coachQ:'', coachR:'', coachOn:false, anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genModo:'sorpresa', genVistos:[], tab:'hoy', sub:'vida', vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
 var docRef = null, habiaLocal = false;
 var saveTimer = null, escribiendo = false, pendiente = false;
 
@@ -1384,7 +1384,7 @@ var PT = {x:0, y:0};
 function burst(fuerte){
   if(sinMov()) return;
   var fx = $('#fx'); if(!fx) return;
-  var cols = ['#FF4D7E','#7B5CFF','#FFC23D','#2F9BFF','#14B88A','#FF8A3D'], n = fuerte ? 30 : 16;
+  var cols = ['#2F9BFF','#7B5CFF','#FFC23D','#2F9BFF','#14B88A','#FF8A3D'], n = fuerte ? 30 : 16;
   for(var i=0;i<n;i++){
     var q = document.createElement('i'), ang = Math.random() * Math.PI * 2, dist = 50 + Math.random() * (fuerte ? 150 : 80);
     q.className = 'px' + (i % 3 === 0 ? ' cora' : '');
@@ -1711,8 +1711,6 @@ function vistaHoy(){
   var cab = '<p class="fecha-hoy">' + esc(fechaCorta(t)) + '</p><h1 class="titulo">' + saludo() + '</h1>';
 
   var g = gestoActual(), rev = state.revelado === k || g.hecho, col = EJE_COL[g.cat] || 'rosa';
-  h += '<button class="hist-btn" data-a="historia"><span class="hist-ring">' + (state.fotoMaria ? '<img alt="" src="' + esc(fotoSrc(state.fotoMaria)) + '">' : '<span>M</span>') + '</span>' +
-    '<span><b>Antes de verla</b><span class="meta">Lo que tienes que saber hoy</span></span><span class="play">' + I.play + '</span></button>';
   h += '<section class="flip' + (rev ? ' volteada' : '') + '" aria-label="Gesto de hoy"><div class="flip-in">' +
     '<button class="cara frente" data-a="revelar"' + (rev ? ' inert' : '') + '><span class="frente-i">' + I.chispa + '</span><b>Tu gesto de hoy</b><span>Toca para verlo</span></button>' +
     '<div class="cara atras gesto g-' + col + (g.hecho ? ' hecho' : '') + '"' + (rev ? '' : ' inert') + '>' +
@@ -2043,7 +2041,7 @@ function radar(){
   }
   return '<section class="tarjeta radar-c"><h2 class="radar-h">Así la estoy queriendo</h2><p class="meta">Últimos 30 días</p>' +
     '<svg class="radar" viewBox="0 0 300 270" role="img" aria-label="' + EJES.map(function(e){ return EJE_N[e] + ' ' + cnt[e]; }).join(', ') + '">' +
-    '<defs><linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF4D7E"/><stop offset="1" stop-color="#7B5CFF"/></linearGradient></defs>' + g + '</svg>' +
+    '<defs><linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F9BFF"/><stop offset="1" stop-color="#7B5CFF"/></linearGradient></defs>' + g + '</svg>' +
     '<p class="radar-tip">' + tip + '</p>' +
     '<div class="radar-l">' + EJES.map(function(e){
       return '<button data-a="radar-ir" data-v="' + e + '"><i style="background:var(--k-' + e + ')"></i>' + EJE_N[e] + ' <b>' + cnt[e] + '</b></button>';
@@ -2197,17 +2195,19 @@ function crecerAprend(){
 }
 
 function elegir(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
-function costoOk(n){ return ui.gf.costo === 'todas' || n === '?' || +n <= +ui.gf.costo; }
+function genFiltros(){ return ui.genModo === 'perso' ? ui.gf : {donde:'todas', costo:'todas', plan:'todas'}; }
+function costoOk(n){ var f = genFiltros(); return f.costo === 'todas' || n === '?' || +n <= +f.costo; }
 function generarCita(){
+  var f = genFiltros();
   var acts = ACTIVIDADES.filter(function(a){
-    return (ui.gf.donde === 'todas' || a[1] === ui.gf.donde) && costoOk(a[2]) && (ui.gf.plan === 'todas' || a[3] === ui.gf.plan);
+    return (f.donde === 'todas' || a[1] === f.donde) && costoOk(a[2]) && (f.plan === 'todas' || a[3] === f.plan);
   });
-  if(ui.gf.donde === 'todas' && ui.gf.plan === 'todas') state.citas.forEach(function(c){ acts.push([c.texto, '', '?', '', true]); });
+  if(f.donde === 'todas' && f.plan === 'todas') state.citas.forEach(function(c){ acts.push([c.texto, '', '?', '', true]); });
   if(!acts.length) return null;
   var nuevas = acts.filter(function(a){ return ui.genVistos.indexOf(a[0]) < 0; });
   if(!nuevas.length){ ui.genVistos = []; nuevas = acts; }
   var a = elegir(nuevas); ui.genVistos.push(a[0]);
-  var lugar = a[1] || (ui.gf.donde !== 'todas' ? ui.gf.donde : (Math.random() < .5 ? 'casa' : 'fuera'));
+  var lugar = a[1] || (f.donde !== 'todas' ? f.donde : (Math.random() < .5 ? 'casa' : 'fuera'));
   var comidas = COMIDAS[lugar].filter(function(c){ return costoOk(c[1]); });
   var c = elegir(comidas.length ? comidas : COMIDAS[lugar]);
   var ords = state.notas.filter(function(n){ return n.cat === 'ordenes' && n.lugar; });
@@ -2219,12 +2219,18 @@ function generarCita(){
   return {plan:a[0], comida:c[0], toque:elegir(toques), lugar:lugar, costo:costo, mia:!!a[4], vibe:a[3]};
 }
 function vistaGenerador(){
-  var h = '<div class="tarjeta gen">' + GEN_F.map(function(f){
+  var perso = ui.genModo === 'perso';
+  var h = '<div class="tarjeta gen"><div class="seg gen-modo" role="tablist">' +
+    [['sorpresa','Sorpréndeme'],['perso','Personalizada']].map(function(m){
+      return '<button role="tab" data-a="gen-modo" data-v="' + m[0] + '" aria-selected="' + (ui.genModo === m[0]) + '">' + m[1] + '</button>';
+    }).join('') + '</div>' +
+  (perso ? '' : '<p class="meta gen-sorpresa">Sin pensarle: te armo un plan completo con lo que hay.</p>') +
+  (perso ? GEN_F.map(function(f){
     return '<span class="rot" id="gf-' + f.g + '">' + f.n + '</span><div class="chips env" role="group" aria-labelledby="gf-' + f.g + '">' + f.o.map(function(o){
       return '<button class="chip" data-a="gen-f" data-g="' + f.g + '" data-v="' + o[0] + '" aria-pressed="' + (ui.gf[f.g] === o[0]) + '">' + o[1] + '</button>';
     }).join('') + '</div>';
-  }).join('') +
-  '<button class="b b-pri b-ancho" style="margin-top:16px" data-a="gen">' + (ui.gen ? 'Generar otra' : 'Generar cita') + '</button></div>';
+  }).join('') : '') +
+  '<button class="b b-pri b-ancho" style="margin-top:16px" data-a="gen">' + (perso ? (ui.gen ? 'Generar otra' : 'Generar cita') : (ui.gen ? 'Sorpréndeme otra vez' : 'Sorpréndeme')) + '</button></div>';
   if(ui.gen){
     var g = ui.gen;
     h += '<section class="tarjeta gen-r g-' + ({tranqui:'cielo', romantica:'rosa', aventura:'coral', creativa:'lila'}[g.vibe] || (g.lugar === 'casa' ? 'lila' : 'coral')) + '" aria-live="polite">' +
@@ -2685,6 +2691,7 @@ function accion(a, el){
         state.rituales.push({id:uid(), nombre:gg[0], cada:gg[1], ultimo:'', cat:CAT_EJE[gc.id]});
       guardar(); render(); toast('Agregado a mis gestos'); break;
     case 'gen-f': ui.gf[el.getAttribute('data-g')] = v; render(); break;
+    case 'gen-modo': ui.genModo = v; ui.gen = null; render(); break;
     case 'gen':
       ui.gen = generarCita();
       if(!ui.gen) toast('No hay ideas con esos filtros');
