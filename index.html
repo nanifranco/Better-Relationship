@@ -849,6 +849,13 @@ body{background:var(--bg)}
 .sit-b .ico svg{width:48px;height:48px}
 .gen-ya{display:inline-flex;align-items:center;gap:6px;cursor:default;background:rgba(255,255,255,.2)!important;color:#FFFFFF!important}
 .gen .rot{margin-top:14px}
+/* objetivo en el radar */
+.radar .robj{fill:none;stroke:#FF8A3D;stroke-width:2;stroke-dasharray:5 5;stroke-linejoin:round}
+.radar-obj{display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 12px}
+.obj-l{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;font-weight:600}
+.obj-l i{width:18px;height:0;border-top:2px dashed #FF8A3D}
+.radar-obj .enlace{min-height:30px;font-size:.86rem}
+.radar-preg{margin:2px 0 14px}
 /* preguntas */
 .preg-azar{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin-bottom:12px;background:color-mix(in srgb,#22A699 12%,var(--surface));border:0}
 .preg-azar[disabled]{opacity:.5}
@@ -1140,9 +1147,9 @@ function blank(){
   return {v:2, bienvenida:false, inicio:'', inicioEj:false, notas:[], regalos:[], fechas:[], manual:[], hechos:{},
           amor:[], amorEj:false, semana:[], rituales:[], ritIni:false, focos:[], revisiones:[], aprend:[],
           valoro:[], pedidos:[], citas:[], chequeo:{cada:30, ultimo:''}, chequeoEj:false,
-          temas:[], respuestas:[], pregMias:[], vida:{}, vidaExtra:[], fotos:[], fotoMaria:null, log:[], retos:{}, revelado:'', actualizado:0};
+          temas:[], respuestas:[], pregMias:[], gestosQuitados:[], vida:{}, vidaExtra:[], fotos:[], fotoMaria:null, log:[], retos:{}, revelado:'', actualizado:0};
 }
-var LISTAS = ['notas','regalos','fechas','manual','amor','semana','rituales','focos','revisiones','aprend','valoro','pedidos','citas','temas','vidaExtra','fotos','log','respuestas','pregMias'];
+var LISTAS = ['notas','regalos','fechas','manual','amor','semana','rituales','focos','revisiones','aprend','valoro','pedidos','citas','temas','vidaExtra','fotos','log','respuestas','pregMias','gestosQuitados'];
 function ritualesBase(){
   return RITUALES_BASE.map(function(r){ return {id:uid(), nombre:r[0], cada:r[1], ultimo:''}; });
 }
@@ -1965,10 +1972,7 @@ function vistaMaria(){
       state.fotos.map(function(f){
         return '<button class="foto-t" role="listitem" data-a="ver-foto" data-id="' + f.id + '" aria-label="' + esc(f.nota || 'Ver foto') + '"><img alt="" loading="lazy" src="' + esc(fotoSrc(f)) + '"></button>';
       }).join('') + '</div>' +
-    '<div class="amor">' + (elegidos.length
-      ? '<span class="amor-l">Se siente querida con</span>' + elegidos.map(function(a){ return '<span class="pill">' + a.n + '</span>'; }).join('') +
-        '<button class="enlace" data-a="amor">Cambiar</button>'
-      : '<button class="enlace" data-a="amor">Elegir cómo se siente más querida</button>') + '</div>';
+    '';
   var h = '<div class="seg" role="tablist">' +
     subs.map(function(s){
       return '<button role="tab" data-a="sub" data-v="' + s[0] + '" aria-selected="' + (ui.sub === s[0]) + '">' + s[1] + '</button>';
@@ -2173,6 +2177,7 @@ function radar(){
   [1/3, 2/3, 1].forEach(function(f){ g += '<polygon class="rg" points="' + EJES.map(function(e, i){ return pt(i, f).join(','); }).join(' ') + '"/>'; });
   EJES.forEach(function(e, i){ var q = pt(i, 1); g += '<line class="rx" x1="' + cx + '" y1="' + cy + '" x2="' + q[0] + '" y2="' + q[1] + '"/>'; });
   var vals = EJES.map(function(e, i){ return pt(i, .08 + .92 * cnt[e] / max); });
+  if(state.amor.length) g += '<polygon class="robj" points="' + EJES.map(function(e, i){ return pt(i, state.amor.indexOf(e) >= 0 ? 1 : .35).join(','); }).join(' ') + '"/>';
   g += '<polygon class="rp" points="' + vals.map(function(v){ return v.join(','); }).join(' ') + '"/>';
   vals.forEach(function(v, i){ g += '<circle class="rd" cx="' + v[0] + '" cy="' + v[1] + '" r="5" fill="var(--k-' + EJES[i] + ')"/>'; });
   EJES.forEach(function(e, i){
@@ -2187,13 +2192,16 @@ function radar(){
     var suyos = state.amor.filter(function(e){ return EJES.indexOf(e) >= 0; });
     if(suyos.length){
       var bajo = suyos.slice().sort(function(a, b){ return cnt[a] - cnt[b]; })[0], nom = (amorDe(bajo) || {n:EJE_N[bajo]}).n.toLowerCase();
-      tip = 'Más: ' + EJE_N[top].toLowerCase() + ' · Se siente querida con: ' + nom;
+      tip = cnt[bajo] >= cnt[top] * .6 && cnt[bajo] > 0 ? 'En el objetivo' : 'Más: ' + EJE_N[top].toLowerCase() + ' · Falta: ' + EJE_N[bajo].toLowerCase();
     } else tip = 'Más: ' + EJE_N[top].toLowerCase() + ' · Menos: ' + EJE_N[orden[orden.length - 1]].toLowerCase();
   }
   return '<section class="tarjeta radar-c"><h2 class="radar-h">Así la estoy queriendo</h2><p class="meta">Últimos 30 días</p>' +
     '<svg class="radar" viewBox="0 0 300 270" role="img" aria-label="' + EJES.map(function(e){ return EJE_N[e] + ' ' + cnt[e]; }).join(', ') + '">' +
     '<defs><linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F9BFF"/><stop offset="1" stop-color="#7B5CFF"/></linearGradient></defs>' + g + '</svg>' +
     '<p class="radar-tip">' + tip + '</p>' +
+    (state.amor.length
+      ? '<div class="radar-obj"><span class="obj-l"><i></i>Objetivo: ' + unir(state.amor.map(function(id){ return (amorDe(id) || {n:id}).n.toLowerCase(); })) + '</span><button class="enlace" data-a="amor">Cambiar</button></div>'
+      : '<button class="b b-pri b-ancho radar-preg" data-a="amor">Preguntarle cómo se siente más querida</button>') +
     '<div class="radar-l">' + EJES.map(function(e){
       return '<button data-a="radar-ir" data-v="' + e + '"><i style="background:var(--k-' + e + ')"></i>' + EJE_N[e] + ' <b>' + cnt[e] + '</b></button>';
     }).join('') + '</div></section>';
@@ -2307,9 +2315,9 @@ function crecerHabitos(){
       : 'Hace ' + plural(g.dias, 'día', 'días') + ' · ' + ritmoTxt(g.cada);
     return '<div class="fila rit' + (g.vencido ? ' venc' : '') + (g.listo ? ' listo' : '') + '" style="--c:var(--k-' + g.eje + ')"><div class="fila-c"><p class="fecha-t chip-c">' + esc(g.t) + '</p>' +
       '<p class="meta">' + meta + '</p>' + (g.dias !== null ? '<div class="barra"><i style="width:' + Math.round(g.frac * 100) + '%"></i></div>' : '') + '</div>' +
-      (g.listo ? '<span class="pill pill-ok">' + I.ok + (g.dias === 0 ? 'Hoy' : 'Listo') + '</span>'
+      (g.listo ? (g.deshacer ? '<button class="b b-sec b-chico" data-a="gesto-deshacer" data-v="' + esc(g.t) + '">Deshacer</button>' : '<span class="pill pill-ok">' + I.ok + 'Listo</span>')
                : '<button class="b b-sec b-chico" data-a="gesto-hoy" data-v="' + esc(g.t) + '">Lo hice hoy</button>') +
-      (g.propio && g.ritual ? '<button class="mini" data-a="del-ritual" data-id="' + g.ritual + '" aria-label="Quitar ' + esc(g.t) + '">' + I.x + '</button>' : '') + '</div>';
+      '<button class="mini" data-a="gesto-quitar" data-v="' + esc(g.t) + '" aria-label="Quitar ' + esc(g.t) + '">' + I.x + '</button></div>';
   }).join('') + '</div>';
   h += '<button class="captura" data-a="ritual">' + I.mas + '<span>Nuevo gesto</span></button>';
   return h;
@@ -2359,20 +2367,36 @@ function ritualPorNombre(t){
 function gestosPool(eje){
   var out = [], vistos = {};
   function add(t, e, cada, r){
-    var key = String(t).toLowerCase(); if(vistos[key]) return; vistos[key] = 1;
+    var key = String(t).toLowerCase(); if(vistos[key] || state.gestosQuitados.indexOf(key) >= 0) return; vistos[key] = 1;
     if(eje && eje !== 'todas' && e !== eje) return;
     var est = r ? ritualEstado(r) : {dias:null, frac:0, vencido:false};
-    out.push({t:t, eje:e, cada:cada, ritual:r ? r.id : null, dias:est.dias, frac:est.frac, vencido:est.vencido,
+    out.push({t:t, eje:e, cada:cada, ritual:r ? r.id : null, dias:est.dias, frac:est.frac, vencido:est.vencido, deshacer: !!r,
       listo: est.dias !== null && !est.vencido, propio: !enCatalogo(t)});
   }
   state.rituales.forEach(function(r){ add(r.nombre, ritualEje(r), +r.cada || 14, r); });
   CATALOGO.forEach(function(c){ c.g.forEach(function(g){ add(g[0], CAT_EJE[c.id], g[1], null); }); });
   return out;
 }
+function deshacerGesto(t){
+  var r = ritualPorNombre(t); if(!r) return;
+  var k = iso(hoy()), eje = ritualEje(r);
+  if(r.ultimo === k){
+    for(var i = state.log.length - 1; i >= 0; i--){ if(state.log[i].f === k && state.log[i].c === eje){ state.log.splice(i, 1); break; } }
+  }
+  var hk = state.hechos[k];
+  if(hk && hk.x && String(hk.x).toLowerCase() === String(t).toLowerCase()){ delete state.hechos[k]; ui.offset = 0; }
+  r.ultimo = r.prevUlt || ''; delete r.prevUlt;
+  if(!r.ultimo && r.auto && enCatalogo(r.nombre)) state.rituales = quitar(state.rituales, r.id);
+}
+function quitarGesto(t){
+  var key = String(t).toLowerCase(), r = ritualPorNombre(t);
+  if(r) state.rituales = quitar(state.rituales, r.id);
+  if(enCatalogo(t) && state.gestosQuitados.indexOf(key) < 0) state.gestosQuitados.push(key);
+}
 function registrarGesto(t, eje, cada){
   var r = ritualPorNombre(t), prev = r ? (r.ultimo || '') : null;
-  if(!r){ r = {id:uid(), nombre:t, cada:cada || 14, ultimo:'', cat:eje}; state.rituales.push(r); }
-  r.ultimo = iso(hoy()); delete r.ejU;
+  if(!r){ r = {id:uid(), nombre:t, cada:cada || 14, ultimo:'', cat:eje, auto:true}; state.rituales.push(r); }
+  r.prevUlt = prev || ''; r.ultimo = iso(hoy()); delete r.ejU;
   return {r:r, prev:prev};
 }
 var GESTO_FORMA = {palabras:'nube', tiempo:'circulo', detalles:'flor', actos:'penta', contacto:'gota'};
@@ -2585,8 +2609,8 @@ function hojaAprend(){
 }
 function hojaAmor(){
   abrirHoja(
-    '<h2 id="ht">¿Cómo se siente más querida?</h2>' +
-    '<p class="apoyo" style="margin:-8px 0 6px">Elijo hasta dos. Si no estoy segura, se lo pregunto: es una buena plática.</p>' +
+    '<h2 id="ht">¿Cómo te sientes más querida?</h2>' +
+    '<p class="apoyo" style="margin:-8px 0 6px">Su respuesta, hasta dos</p>' +
     AMOR.map(function(a){
       return '<button class="opc" data-a="amor-op" data-v="' + a.id + '" aria-pressed="' + (state.amor.indexOf(a.id) >= 0) + '"><div><b>' + a.n + '</b><span>' + a.d + '</span></div></button>';
     }).join('') +
@@ -2743,6 +2767,7 @@ function hojaAjustes(){
       (hayEjemplos()
         ? '<button class="b b-sec b-ancho" data-a="quitar-ej">Quitar ejemplos</button>'
         : '<button class="b b-sec b-ancho" data-a="cargar-ej">Cargar ejemplos</button>') +
+      (state.gestosQuitados.length ? '<button class="b b-sec b-ancho" style="margin-top:10px" data-a="gestos-recuperar">Recuperar ' + plural(state.gestosQuitados.length, 'gesto quitado', 'gestos quitados') + '</button>' : '') +
       '<button class="b b-peligro b-ancho" style="margin-top:10px" data-a="borrar">' + (ui.borrar ? 'Toca otra vez para borrar todo' : 'Borrar todo') + '</button>' +
     '</div>' +
     '<div class="hoja-b"><button class="b b-sec" data-a="cerrar">Cerrar</button></div>', 'ajustes');
@@ -2938,6 +2963,9 @@ function accion(a, el){
     case 'ir-gestos': ui.tab = 'crecer'; ui.crecer = 'habitos'; window.scrollTo(0, 0); render(); break;
     case 'cat-g': ui.catG = v; render(); break;
     case 'g-tipo': ui.gTipo = v; render(); break;
+    case 'gesto-deshacer': deshacerGesto(v); guardar(); render(); toast('Deshecho'); break;
+    case 'gesto-quitar': quitarGesto(v); guardar(); render(); toast('Quitado'); break;
+    case 'gestos-recuperar': state.gestosQuitados = []; guardar(); cerrarHoja(); render(); toast('Gestos recuperados'); break;
     case 'gesto-hoy':
       var gp0 = gestosPool('todas').filter(function(x){ return x.t === v; })[0]; if(!gp0) break;
       registrarGesto(gp0.t, gp0.eje, gp0.cada); anotar(gp0.eje, 'r'); guardar(); render(); burst(false); toast('Anotado'); break;
@@ -3158,7 +3186,7 @@ function accion(a, el){
       var ri = buscar(state.rituales, id); if(!ri) break;
       ri.ultimo = k; delete ri.ejU; anotar(ritualEje(ri), 'r'); guardar(); render(); burst(false); toast('Anotado'); break;
     case 'del-ritual':
-      state.rituales = quitar(state.rituales, id); guardar(); render(); toast('Quitado'); break;
+      var rq = buscar(state.rituales, id); if(rq) quitarGesto(rq.nombre); guardar(); render(); toast('Quitado'); break;
 
     case 'add-foco':
     case 'foco-sug':
