@@ -1197,6 +1197,7 @@ function normalize(o){
     s.datosNani = true;
   }
   if(!s.ritIni){ if(!s.rituales.length) s.rituales = ritualesBase(); s.ritIni = true; }
+  quitarEjemplos(s);
   return s;
 }
 function copia(o){ return JSON.parse(JSON.stringify(o)); }
@@ -1511,13 +1512,6 @@ function ritualEstado(r){
   if(!u) return {dias:null, frac:0, clase:'', hoy:false, vencido:false};
   var n = Math.max(0, dias(u, hoy())), f = Math.min(1, n / cada);
   return {dias:n, frac:f, clase: n >= cada ? 'venc' : (f >= .75 ? 'medio' : ''), hoy: n === 0, vencido: n >= cada};
-}
-function hayEjemplos(){
-  if(state.inicioEj || state.amorEj || state.chequeoEj) return true;
-  var k = ['notas','regalos','fechas','semana','focos','revisiones','aprend','valoro','pedidos','temas','log','respuestas'];
-  for(var i=0;i<k.length;i++) if(state[k[i]].some(function(x){ return x.ej; })) return true;
-  if(state.rituales.some(function(r){ return r.ejU; })) return true;
-  return state.manual.some(function(m){ return BLOQUES.some(function(b){ return m[b.id].some(function(x){ return x.ej; }); }); });
 }
 
 function gestos(){
@@ -1861,23 +1855,6 @@ function mi(){ return ''; }
 function sec(titulo, cuenta, extra, ico){
   return '<div class="sec">' + (ico || '') + '<h2 class="sub">' + titulo + '</h2>' +
     (cuenta ? '<span class="cuenta">' + cuenta + '</span>' : '') + (extra || '') + '</div>';
-}
-
-function vistaBienvenida(){
-  function punto(clase, icono, titulo, texto){
-    return '<li><span class="ico ' + clase + '">' + icono + '</span><div><b>' + titulo + '</b><p>' + texto + '</p></div></li>';
-  }
-  return '<div class="bien"><div class="bien-blobs" aria-hidden="true">' + blob('penta','#5B7FE0') + blob('circulo','#FF8A3D') + blob('flor','#8E63E8','feliz') + blob('gota','#22A699') + blob('nube','#F5A524') + '</div>' +
-    '<div class="marca-g">Nov</div>' +
-    '<h1 class="bien-x">Para ser mejor pareja, un gesto a la vez.</h1>' +
-    '<ul class="puntos">' +
-      punto('ico-gustos', I.cora, 'La conozco mejor cada semana', 'Lo que trae encima, sus sueños y cómo se siente querida.') +
-      punto('ico-dijo', I.crecer, 'Trabajo mi parte', 'Lo que ella me ha pedido, mis gestos y lo que aprendo de cada discusión.') +
-      punto('ico-tallas', I.guia, 'Guías para lo difícil', 'Qué hago antes de contestar, cómo me disculpo y cómo digo lo que me molesta.') +
-      punto('ico-comida', I.chispa, 'Un gesto con sentido cada día', 'Sale de lo que he anotado, no de una lista genérica.') +
-    '</ul>' +
-    '<button class="b b-pri b-ancho" data-a="empezar" data-v="ej">Verla con ejemplos</button>' +
-    '<button class="b b-sec b-ancho" data-a="empezar" data-v="blanco">Empezar en blanco</button></div>';
 }
 
 function gestoActual(){
@@ -2800,74 +2777,18 @@ function hojaAjustes(){
       '<div class="hoja-b" style="margin-top:0"><button class="b b-sec" data-a="datos-copiar">Copiar mis datos</button>' +
       '<button class="b b-sec" data-a="datos-pegar">Pegar mis datos</button></div></div>' +
     '<div class="linea">' +
-      (hayEjemplos()
-        ? '<button class="b b-sec b-ancho" data-a="quitar-ej">Quitar ejemplos</button>'
-        : '<button class="b b-sec b-ancho" data-a="cargar-ej">Cargar ejemplos</button>') +
-      (state.gestosQuitados.length ? '<button class="b b-sec b-ancho" style="margin-top:10px" data-a="gestos-recuperar">Recuperar ' + plural(state.gestosQuitados.length, 'gesto quitado', 'gestos quitados') + '</button>' : '') +
-      '<button class="b b-peligro b-ancho" style="margin-top:10px" data-a="borrar">' + (ui.borrar ? 'Toca otra vez para borrar todo' : 'Borrar todo') + '</button>' +
+      (state.gestosQuitados.length ? '<button class="b b-sec b-ancho" style="margin-bottom:10px" data-a="gestos-recuperar">Recuperar ' + plural(state.gestosQuitados.length, 'gesto quitado', 'gestos quitados') + '</button>' : '') +
+      '<button class="b b-peligro b-ancho" data-a="borrar">' + (ui.borrar ? 'Toca otra vez para borrar todo' : 'Borrar todo') + '</button>' +
     '</div>' +
     '<div class="hoja-b"><button class="b b-sec" data-a="cerrar">Cerrar</button></div>', 'ajustes');
 }
 
-/* ---------- ejemplos ---------- */
+/* ---------- base ---------- */
 function situacionesBase(){
   return SITUACIONES.map(function(n){ return {id:uid(), nombre:n, ayuda:[], evitar:[], frases:[]}; });
 }
-function cargarEjemplos(){
-  var t = hoy();
-  function nota(cat, texto){ var n = {id:uid(), cat:cat, texto:texto, ej:true}; state.notas.push(n); return n; }
-  nota('gustos', 'Los girasoles, más que las rosas');
-  nota('gustos', 'Las librerías de viejo. Puede pasar horas ahí');
-  nota('comida', 'Tacos al pastor con piña extra');
-  nota('suenos', 'Quiere poner su propio estudio algún día');
-  nota('nogusta', 'Que le cambien los planes a última hora');
-  nota('tallas', 'Anillo 6, zapato 24');
-  var c = nota('dijo', 'Quiere aprender cerámica este año');
-  var g = {id:uid(), texto:'Una clase de cerámica para dos', notaId:c.id, dado:false, ej:true};
-  c.regaloId = g.id;
-  state.regalos.push(g, {id:uid(), texto:'Girasoles un día cualquiera', dado:false, ej:true});
-  state.fechas.push({id:uid(), titulo:'Su graduación', fecha:iso(masDias(t, 12)), anual:false, aviso:14, ej:true});
-  var pesos = ['tiempo','tiempo','detalles','tiempo','palabras','actos','detalles','tiempo','contacto','actos'];
-  for(var li=1; li<=40; li++){
-    if(li % 3 === 0 || li % 7 === 0) continue;
-    state.log.push({id:uid(), f:iso(masDias(t, -li)), c:pesos[li % pesos.length], src:'ej', ej:true});
-    if(li % 4 === 1) state.log.push({id:uid(), f:iso(masDias(t, -li)), c:pesos[(li + 3) % pesos.length], src:'ej', ej:true});
-  }
-  [1, 2].forEach(function(wk){ var kk = iso(masDias(lunes(t), -7 * wk)); if(!state.retos[kk]) state.retos[kk] = {i:wk * 3, n:1, ok:true, ej:true}; });
-  state.temas.push({id:uid(), texto:'Que me gustaría vernos más entre semana', tipo:'propuesta', urge:'pronto',
-    porque:'Siento que solo nos vemos los fines y la extraño', fecha:iso(masDias(t, -6)), hablado:'', resultado:'', ej:true});
-  state.semana.push(
-    {id:uid(), texto:'Entrega de su proyecto final', fecha:iso(masDias(t, 3)), ej:true},
-    {id:uid(), texto:'Anda preocupada por su abuela', fecha:'', ej:true}
-  );
-  if(!state.manual.length) state.manual = situacionesBase();
-  var m = state.manual.filter(function(x){ return x.nombre === 'Estresada'; })[0] || state.manual[0];
-  m.ayuda.push({id:uid(), t:'Preguntarle si quiere soluciones o solo que la escuche', ej:true},
-               {id:uid(), t:'Llevarle algo de comer sin preguntar', ej:true});
-  m.evitar.push({id:uid(), t:'Decirle que se calme', ej:true});
-  m.frases.push({id:uid(), t:'Estoy aquí. ¿Qué necesitas ahorita?', ej:true});
-  if(!state.inicio){ state.inicio = iso(new Date(t.getFullYear() - 3, t.getMonth(), t.getDate() + 41)); state.inicioEj = true; }
-  if(!state.amor.length){ state.amorP = {tiempo:5, palabras:4, contacto:4, detalles:2, actos:1}; state.amor = amorTop(state.amorP); state.amorEj = true; }
-  if(!state.chequeo.ultimo){ state.chequeo.ultimo = iso(masDias(t, -18)); state.chequeoEj = true; }
-  var hace = [16, 5, 3, 40];
-  state.rituales.forEach(function(r, i){ if(!r.ultimo && hace[i] != null){ r.ultimo = iso(masDias(t, -hace[i])); r.ejU = true; } });
-  var f1 = {id:uid(), texto:'Escuchar sin dar consejos', ej:true}, f2 = {id:uid(), texto:'No ponerme a la defensiva', ej:true};
-  if(state.focos.length <= 1) state.focos.push(f1, f2);
-  [[3,1,2,'Avisarle si voy tarde'],[2,2,2,'Preguntarle por su día antes de contar el mío'],[1,3,2,'Una cita sin celulares']].forEach(function(x){
-    var k = iso(masDias(lunes(t), -7*x[0]));
-    if(revisionDe(k)) return;
-    var fo = {}; fo[f1.id] = x[1]; fo[f2.id] = x[2];
-    state.revisiones.push({id:uid(), semana:k, focos:fo, bien:'', mejorar:'', compromiso:x[3], ej:true});
-  });
-  state.valoro.push({id:uid(), texto:'Me esperó despierta aunque estaba cansada', fecha:iso(masDias(t, -1)), dicho:false, ej:true},
-                    {id:uid(), texto:'Cómo defiende a sus amigas', fecha:iso(masDias(t, -4)), dicho:true, ej:true});
-  state.pedidos.push({id:uid(), texto:'Que le avise cuando llegue a casa', veces:3, ultimo:iso(masDias(t, -2)), ej:true});
-  state.respuestas.push({id:uid(), q:'¿Café o té?', a:'Café, pero en la tarde un té de manzanilla', cat:'esto', fecha:iso(masDias(t, -3)), ej:true},
-    {id:uid(), q:'¿Qué te hace sentir más querida?', a:'Que me escuches sin estar viendo el celular', cat:'querer', fecha:iso(masDias(t, -8)), ej:true});
-  state.aprend.push({id:uid(), fecha:iso(masDias(t, -9)), que:'Discutimos porque llegué tarde sin avisar',
-    parte:'No avisé, y luego minimicé que le molestara', acuerdo:'Avisar en cuanto sepa que voy tarde', ej:true});
-}
-function quitarEjemplos(){
+/* Los ejemplos ya no existen; esto limpia los que hayan quedado guardados de antes. */
+function quitarEjemplos(state){
   var ids = {};
   state.regalos.forEach(function(r){ if(r.ej) ids[r.id] = 1; });
   ['notas','regalos','fechas','semana','focos','revisiones','aprend','valoro','pedidos','temas','log','respuestas'].forEach(function(k){ state[k] = state[k].filter(function(x){ return !x.ej; }); });
@@ -3112,10 +3033,6 @@ function accion(a, el){
       state.citas = quitar(state.citas, id); guardar(); render(); toast('Idea borrada'); break;
     case 'ir-regalos': ui.tab = 'maria'; ui.sub = 'regalos'; window.scrollTo(0, 0); render(); break;
 
-    case 'empezar':
-      state.manual = situacionesBase();
-      if(v === 'ej') cargarEjemplos();
-      state.bienvenida = true; ui.anim = true; guardar(); render(); break;
 
     case 'hecho':
       if(state.hechos[k]){ var hk = state.hechos[k], rh = hk.x && ritualPorNombre(hk.x);
@@ -3284,8 +3201,6 @@ function accion(a, el){
       if(iv && (!parse(iv) || dias(parse(iv), hoy()) < 0)){ falta('#a-e', 'Elige un día que ya haya pasado.'); break; }
       state.inicio = iv || ''; state.inicioEj = false;
       guardar(); cerrarHoja(); render(); toast(iv ? 'Fecha guardada' : 'Fecha quitada'); break;
-    case 'cargar-ej': cargarEjemplos(); guardar(); cerrarHoja(); render(); toast('Ejemplos cargados'); break;
-    case 'quitar-ej': quitarEjemplos(); guardar(); cerrarHoja(); render(); toast('Ejemplos quitados'); break;
     case 'borrar':
       if(!ui.borrar){ ui.borrar = true; hojaAjustes(); ui.borrar = true; break; }
       state = normalize(null); ui.tab = 'hoy'; ui.sub = 'preguntas'; ui.crecer = 'semana'; ui.citaSel = ''; ui.filtro = 'todas'; ui.abierta = null; ui.offset = 0;
