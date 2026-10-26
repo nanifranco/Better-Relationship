@@ -2223,8 +2223,8 @@ function chequeoEstado(){
 }
 function tarjetaChequeo(corta){
   var e = chequeoEstado();
-  var estado = e.nunca ? 'todavía no hemos tenido ninguno' : e.dias === 0 ? 'lo tuvimos hoy'
-    : 'el último fue hace ' + plural(e.dias, 'día', 'días') + (e.toca ? '' : '. el siguiente toca en ' + plural(e.faltan, 'día', 'días'));
+  var estado = e.nunca ? 'Todavía ninguno' : e.dias === 0 ? 'Hoy'
+    : 'El último fue hace ' + plural(e.dias, 'día', 'días') + (e.toca ? '' : ' · el siguiente en ' + plural(e.faltan, 'día', 'días'));
   return '<section class="tarjeta cheq">' +
     '<div class="cheq-top"><h2>Chequeo con María</h2>' + (e.toca ? '<span class="pill pill-rosa">Ya toca</span>' : '') + '</div>' +
     (corta ? '' : mi('una vez al mes, sentarnos a platicar cómo vamos, sin celular')) +
@@ -2806,6 +2806,7 @@ function accion(a, el){
       var pqi = document.querySelector('[data-foco="preg"]'), pqt = pqi ? pqi.value.trim() : '';
       if(!pqt){ if(pqi) pqi.focus(); break; }
       if(!/^¿/.test(pqt)) pqt = '¿' + pqt.replace(/\?+$/, '') + '?';
+      pqt = '¿' + pqt.charAt(1).toUpperCase() + pqt.slice(2);
       state.pregMias.push({id:uid(), q:pqt}); ui.foco = 'preg'; guardar(); render(); break;
     case 'del-preg': state.pregMias = quitar(state.pregMias, id); guardar(); render(); break;
     case 'datos-copiar': hojaDatos(); break;
