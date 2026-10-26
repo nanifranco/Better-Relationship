@@ -284,6 +284,14 @@ textarea.campo{min-height:104px;resize:vertical;line-height:1.4}
 .opc[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
 .opc b{display:block;font-size:.96rem;font-weight:700}
 .opc span{font-size:.84rem;color:var(--muted)}
+.punt{padding:12px 0;border-bottom:1px solid var(--line2)}
+.punt:last-of-type{border-bottom:0}
+.punt b{display:block;font-size:.96rem;font-weight:700}
+.punt>span{display:block;font-size:.84rem;color:var(--muted);margin-top:2px}
+.punt-b{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}
+.punt-b button{min-height:40px;border-radius:10px;border:1.5px solid var(--line2);font-weight:700;font-size:.96rem}
+.punt-b button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent);color:var(--accent-fg)}
+.punt-esc{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted);margin-top:4px}
 
 /* ---- Crecer ---- */
 .rev h2{font-size:1.1rem;font-weight:800;letter-spacing:-.02em}
@@ -1154,7 +1162,7 @@ var I = {
 /* ---------- estado ---------- */
 function blank(){
   return {v:2, bienvenida:false, inicio:'', inicioEj:false, notas:[], regalos:[], fechas:[], manual:[], hechos:{},
-          amor:[], amorEj:false, semana:[], rituales:[], ritIni:false, focos:[], revisiones:[], aprend:[],
+          amor:[], amorP:{}, amorEj:false, semana:[], rituales:[], ritIni:false, focos:[], revisiones:[], aprend:[],
           valoro:[], pedidos:[], citas:[], chequeo:{cada:30, ultimo:''}, chequeoEj:false,
           temas:[], respuestas:[], pregMias:[], gestosQuitados:[], vida:{}, vidaExtra:[], fotos:[], fotoMaria:null, log:[], retos:{}, revelado:'', actualizado:0};
 }
@@ -1169,6 +1177,9 @@ function normalize(o){
   s.manual.forEach(function(m){ BLOQUES.forEach(function(bl){ if(!Array.isArray(m[bl.id])) m[bl.id] = []; }); });
   s.revisiones.forEach(function(r){ if(!r.focos || typeof r.focos !== 'object') r.focos = {}; });
   if(!s.hechos || typeof s.hechos !== 'object') s.hechos = {};
+  if(!s.amorP || typeof s.amorP !== 'object' || Array.isArray(s.amorP)) s.amorP = {};
+  if(!Object.keys(s.amorP).length && s.amor.length) s.amor.forEach(function(id){ s.amorP[id] = 4; });
+  s.amor = amorTop(s.amorP);
   if(typeof s.inicio !== 'string') s.inicio = '';
   if(!s.chequeo || typeof s.chequeo !== 'object') s.chequeo = {cada:30, ultimo:''};
   s.chequeo.cada = 30; s.chequeoMes = true;
@@ -1266,6 +1277,7 @@ function fusionar(remoto, local){
   });
   if(!r.manual.length) r.manual = local.manual;
   if(!r.inicio && local.inicio) r.inicio = local.inicio;
+  if(!Object.keys(r.amorP).length && Object.keys(local.amorP || {}).length){ r.amorP = local.amorP; r.amor = amorTop(r.amorP); }
   if(!r.amor.length) r.amor = local.amor;
   if(!r.fotoMaria && local.fotoMaria) r.fotoMaria = local.fotoMaria;
   Object.keys(local.retos || {}).forEach(function(k){ if(!r.retos[k]) r.retos[k] = local.retos[k]; });
@@ -1418,6 +1430,13 @@ function plural(n, uno, varios){ return n + ' ' + (n === 1 ? uno : varios); }
 function unir(p){ return p.length > 1 ? p.slice(0, -1).join(', ') + ' y ' + p[p.length-1] : (p[0] || ''); }
 function catNombre(id){ for(var i=0;i<CATS.length;i++) if(CATS[i].id === id) return CATS[i].nombre; return 'Nota'; }
 function ritmoTxt(n){ for(var i=0;i<RITMOS.length;i++) if(RITMOS[i][0] === +n) return RITMOS[i][1].toLowerCase(); return 'cada ' + n + ' días'; }
+/* Puntuación del 1 al 4 que ella le da a cada forma. state.amor = las que puntuó más alto. */
+function amorPunt(p, id){ var v = +(p || state.amorP)[id]; return v >= 1 && v <= 4 ? v : 0; }
+function amorListo(p){ return AMOR.every(function(a){ return amorPunt(p, a.id) > 0; }); }
+function amorTop(p){
+  var max = 0; AMOR.forEach(function(a){ max = Math.max(max, amorPunt(p, a.id)); });
+  return max ? AMOR.filter(function(a){ return amorPunt(p, a.id) === max; }).map(function(a){ return a.id; }) : [];
+}
 function amorDe(id){ for(var i=0;i<AMOR.length;i++) if(AMOR[i].id === id) return AMOR[i]; return null; }
 function buscar(arr, id){ for(var i=0;i<arr.length;i++) if(arr[i].id === id) return arr[i]; return null; }
 function quitar(arr, id){ return arr.filter(function(x){ return x.id !== id; }); }
@@ -1754,7 +1773,7 @@ function contextoNov(){
   var L = [];
   var ini = parse(state.inicio); if(ini) L.push('Juntas desde: ' + iso(ini));
   var cum = state.fechas.filter(function(f){ return f.nacio; })[0]; if(cum) L.push('Cumpleaños de María: ' + cum.fecha);
-  if(state.amor.length) L.push('Se siente querida con: ' + state.amor.map(function(id){ return (amorDe(id) || {n:id}).n; }).join(', '));
+  if(state.amor.length) L.push('Cómo se siente querida (ella lo puntuó del 1 al 4): ' + AMOR.filter(function(a){ return amorPunt(null, a.id); }).sort(function(a, b){ return amorPunt(null, b.id) - amorPunt(null, a.id); }).map(function(a){ return a.n + ' ' + amorPunt(null, a.id); }).join(', '));
   CATS.forEach(function(c){
     var ns = state.notas.filter(function(n){ return n.cat === c.id; }).slice(0, 12);
     if(ns.length) L.push(c.nombre + ': ' + ns.map(function(n){ return (n.lugar ? n.lugar + ' - ' : '') + n.texto; }).join('; '));
@@ -2186,7 +2205,7 @@ function radar(){
   [1/3, 2/3, 1].forEach(function(f){ g += '<polygon class="rg" points="' + EJES.map(function(e, i){ return pt(i, f).join(','); }).join(' ') + '"/>'; });
   EJES.forEach(function(e, i){ var q = pt(i, 1); g += '<line class="rx" x1="' + cx + '" y1="' + cy + '" x2="' + q[0] + '" y2="' + q[1] + '"/>'; });
   var vals = EJES.map(function(e, i){ return pt(i, .08 + .92 * cnt[e] / max); });
-  if(state.amor.length) g += '<polygon class="robj" points="' + EJES.map(function(e, i){ return pt(i, state.amor.indexOf(e) >= 0 ? 1 : .35).join(','); }).join(' ') + '"/>';
+  if(state.amor.length) g += '<polygon class="robj" points="' + EJES.map(function(e, i){ return pt(i, Math.max(amorPunt(null, e), 1) / 4).join(','); }).join(' ') + '"/>';
   g += '<polygon class="rp" points="' + vals.map(function(v){ return v.join(','); }).join(' ') + '"/>';
   vals.forEach(function(v, i){ g += '<circle class="rd" cx="' + v[0] + '" cy="' + v[1] + '" r="5" fill="var(--k-' + EJES[i] + ')"/>'; });
   EJES.forEach(function(e, i){
@@ -2198,10 +2217,13 @@ function radar(){
   if(!total) tip = 'Sin gestos este mes';
   else {
     var orden = EJES.slice().sort(function(a, b){ return cnt[b] - cnt[a]; }), top = orden[0];
-    var suyos = state.amor.filter(function(e){ return EJES.indexOf(e) >= 0; });
-    if(suyos.length){
-      var bajo = suyos.slice().sort(function(a, b){ return cnt[a] - cnt[b]; })[0], nom = (amorDe(bajo) || {n:EJE_N[bajo]}).n.toLowerCase();
-      tip = cnt[bajo] >= cnt[top] * .6 && cnt[bajo] > 0 ? 'En el objetivo' : 'Más: ' + EJE_N[top].toLowerCase() + ' · Falta: ' + EJE_N[bajo].toLowerCase();
+    var sumP = EJES.reduce(function(s, e){ return s + Math.max(amorPunt(null, e), 1); }, 0);
+    if(state.amor.length){
+      // Compara qué parte de tus gestos va a cada forma contra qué parte le toca según sus puntuaciones.
+      var hueco = {}; EJES.forEach(function(e){ hueco[e] = Math.max(amorPunt(null, e), 1) / sumP - cnt[e] / total; });
+      var bajo = EJES.slice().sort(function(a, b){ return hueco[b] - hueco[a]; })[0];
+      var sobra = EJES.slice().sort(function(a, b){ return hueco[a] - hueco[b]; })[0];
+      tip = hueco[bajo] < .1 ? 'En el objetivo' : 'De más: ' + EJE_N[sobra].toLowerCase() + ' · Falta: ' + EJE_N[bajo].toLowerCase();
     } else tip = 'Más: ' + EJE_N[top].toLowerCase() + ' · Menos: ' + EJE_N[orden[orden.length - 1]].toLowerCase();
   }
   return '<section class="tarjeta radar-c"><h2 class="radar-h">Así la estoy queriendo</h2><p class="meta">Últimos 30 días</p>' +
@@ -2209,10 +2231,11 @@ function radar(){
     '<defs><linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F9BFF"/><stop offset="1" stop-color="#7B5CFF"/></linearGradient></defs>' + g + '</svg>' +
     '<p class="radar-tip">' + tip + '</p>' +
     (state.amor.length
-      ? '<div class="radar-obj"><span class="obj-l"><i></i>Objetivo: ' + unir(state.amor.map(function(id){ return (amorDe(id) || {n:id}).n.toLowerCase(); })) + '</span><button class="enlace" data-a="amor">Cambiar</button></div>'
-      : '<button class="b b-pri b-ancho radar-preg" data-a="amor">Preguntarle cómo se siente más querida</button>') +
+      ? '<div class="radar-obj"><span class="obj-l"><i></i>Su forma: ' + unir(state.amor.map(function(id){ return (amorDe(id) || {n:id}).n.toLowerCase(); })) + '</span><button class="enlace" data-a="amor">' + (amorListo() ? 'Cambiar' : 'Completar') + '</button></div>'
+      : '<button class="b b-pri b-ancho radar-preg" data-a="amor">Preguntarle cómo se siente querida</button>') +
     '<div class="radar-l">' + EJES.map(function(e){
-      return '<button data-a="radar-ir" data-v="' + e + '"><i style="background:var(--k-' + e + ')"></i>' + EJE_N[e] + ' <b>' + cnt[e] + '</b></button>';
+      var sp = amorPunt(null, e);
+      return '<button data-a="radar-ir" data-v="' + e + '"' + (sp ? ' aria-label="' + EJE_N[e] + ': ' + cnt[e] + ' gestos, ella le da ' + sp + ' de 4"' : '') + '><i style="background:var(--k-' + e + ')"></i>' + EJE_N[e] + ' <b>' + cnt[e] + '</b></button>';
     }).join('') + '</div></section>';
 }
 
@@ -2618,10 +2641,14 @@ function hojaAprend(){
 }
 function hojaAmor(){
   abrirHoja(
-    '<h2 id="ht">¿Cómo te sientes más querida?</h2>' +
-    '<p class="apoyo" style="margin:-8px 0 6px">Su respuesta, hasta dos</p>' +
+    '<h2 id="ht">¿Cómo te sientes querida?</h2>' +
+    '<p class="apoyo" style="margin:-8px 0 6px">Que ella le ponga a cada una del 1 (poco) al 4 (muchísimo)</p>' +
     AMOR.map(function(a){
-      return '<button class="opc" data-a="amor-op" data-v="' + a.id + '" aria-pressed="' + (state.amor.indexOf(a.id) >= 0) + '"><div><b>' + a.n + '</b><span>' + a.d + '</span></div></button>';
+      var v = amorPunt(null, a.id);
+      return '<div class="punt" role="group" aria-label="' + a.n + '"><b>' + a.n + '</b><span>' + a.d + '</span>' +
+        '<div class="punt-b">' + [1,2,3,4].map(function(n){
+          return '<button data-a="amor-op" data-v="' + a.id + '" data-n="' + n + '" aria-pressed="' + (v === n) + '" aria-label="' + n + ' de 4">' + n + '</button>';
+        }).join('') + '</div><div class="punt-esc"><span>Poco</span><span>Muchísimo</span></div></div>';
     }).join('') +
     '<p class="error" id="m-e" role="alert"></p>' + botones('guardar-amor', 'Guardar'), 'amor');
 }
@@ -2820,7 +2847,7 @@ function cargarEjemplos(){
   m.evitar.push({id:uid(), t:'Decirle que se calme', ej:true});
   m.frases.push({id:uid(), t:'Estoy aquí. ¿Qué necesitas ahorita?', ej:true});
   if(!state.inicio){ state.inicio = iso(new Date(t.getFullYear() - 3, t.getMonth(), t.getDate() + 41)); state.inicioEj = true; }
-  if(!state.amor.length){ state.amor = ['tiempo','palabras']; state.amorEj = true; }
+  if(!state.amor.length){ state.amorP = {tiempo:4, palabras:3, contacto:3, detalles:2, actos:1}; state.amor = amorTop(state.amorP); state.amorEj = true; }
   if(!state.chequeo.ultimo){ state.chequeo.ultimo = iso(masDias(t, -18)); state.chequeoEj = true; }
   var hace = [16, 5, 3, 40];
   state.rituales.forEach(function(r, i){ if(!r.ultimo && hace[i] != null){ r.ultimo = iso(masDias(t, -hace[i])); r.ejU = true; } });
@@ -2849,7 +2876,7 @@ function quitarEjemplos(){
   state.manual.forEach(function(m){ BLOQUES.forEach(function(b){ m[b.id] = m[b.id].filter(function(x){ return !x.ej; }); }); });
   state.rituales.forEach(function(r){ if(r.ejU){ r.ultimo = ''; delete r.ejU; } });
   if(state.inicioEj){ state.inicio = ''; state.inicioEj = false; }
-  if(state.amorEj){ state.amor = []; state.amorEj = false; }
+  if(state.amorEj){ state.amor = []; state.amorP = {}; state.amorEj = false; }
   if(state.chequeoEj){ state.chequeo.ultimo = ''; state.chequeoEj = false; }
 }
 
@@ -3119,11 +3146,13 @@ function accion(a, el){
       if(el.parentNode.id === 'n-cats' && $('#n-lugar')) $('#n-lugar').hidden = v !== 'ordenes';
       break;
     case 'amor-op':
-      var on = el.getAttribute('aria-pressed') === 'true';
-      if(!on && document.querySelectorAll('#hoja .opc[aria-pressed="true"]').length >= 2){ falta('#m-e', 'Elige máximo dos. Quita una para cambiarla.'); break; }
-      el.setAttribute('aria-pressed', on ? 'false' : 'true'); $('#m-e').textContent = ''; break;
+      [].forEach.call(el.parentNode.children, function(c){ c.setAttribute('aria-pressed', c === el ? 'true' : 'false'); });
+      $('#m-e').textContent = ''; break;
     case 'guardar-amor':
-      state.amor = [].map.call(document.querySelectorAll('#hoja .opc[aria-pressed="true"]'), function(e){ return e.getAttribute('data-v'); });
+      var np = {};
+      [].forEach.call(document.querySelectorAll('#hoja .punt-b button[aria-pressed="true"]'), function(e){ np[e.getAttribute('data-v')] = +e.getAttribute('data-n'); });
+      if(!amorListo(np)){ falta('#m-e', 'Falta que puntúe ' + unir(AMOR.filter(function(a){ return !np[a.id]; }).map(function(a){ return a.n.toLowerCase(); })) + '.'); break; }
+      state.amorP = np; state.amor = amorTop(np);
       state.amorEj = false; guardar(); cerrarHoja(); render(); toast('Guardado'); break;
 
     case 'guardar-nota':
