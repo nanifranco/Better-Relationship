@@ -826,6 +826,15 @@ body{background:var(--bg)}
 /* barra inferior */
 .tab{font-weight:600}
 .tab[aria-current="page"] .tab-i{background:var(--accent-soft);animation:none}
+/* preguntas */
+.preg-azar{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin-bottom:12px;background:color-mix(in srgb,#22A699 12%,var(--surface));border:0}
+.preg-azar[disabled]{opacity:.5}
+.preg-azar-b{width:46px;height:46px;flex:none}
+.preg-azar b{display:block;font-weight:600}
+.preg-azar .meta{margin:0}
+.preg-q{text-align:left;min-width:0}
+.preg-r-q{margin:0 0 2px}
+.fila-f .preg-q{padding:0}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1108,9 +1117,9 @@ function blank(){
   return {v:2, bienvenida:false, inicio:'', inicioEj:false, notas:[], regalos:[], fechas:[], manual:[], hechos:{},
           amor:[], amorEj:false, semana:[], rituales:[], ritIni:false, focos:[], revisiones:[], aprend:[],
           valoro:[], pedidos:[], citas:[], chequeo:{cada:30, ultimo:''}, chequeoEj:false,
-          temas:[], vida:{}, vidaExtra:[], fotos:[], fotoMaria:null, log:[], retos:{}, revelado:'', actualizado:0};
+          temas:[], respuestas:[], pregMias:[], vida:{}, vidaExtra:[], fotos:[], fotoMaria:null, log:[], retos:{}, revelado:'', actualizado:0};
 }
-var LISTAS = ['notas','regalos','fechas','manual','amor','semana','rituales','focos','revisiones','aprend','valoro','pedidos','citas','temas','vidaExtra','fotos','log'];
+var LISTAS = ['notas','regalos','fechas','manual','amor','semana','rituales','focos','revisiones','aprend','valoro','pedidos','citas','temas','vidaExtra','fotos','log','respuestas','pregMias'];
 function ritualesBase(){
   return RITUALES_BASE.map(function(r){ return {id:uid(), nombre:r[0], cada:r[1], ultimo:''}; });
 }
@@ -1123,7 +1132,7 @@ function normalize(o){
   if(!s.hechos || typeof s.hechos !== 'object') s.hechos = {};
   if(typeof s.inicio !== 'string') s.inicio = '';
   if(!s.chequeo || typeof s.chequeo !== 'object') s.chequeo = {cada:30, ultimo:''};
-  if(!s.chequeoMes){ s.chequeo.cada = 30; s.chequeoMes = true; }
+  s.chequeo.cada = 30; s.chequeoMes = true;
   if(!s.vida || typeof s.vida !== 'object' || Array.isArray(s.vida)) s.vida = {};
   if(!s.retos || typeof s.retos !== 'object' || Array.isArray(s.retos)) s.retos = {};
   if(!s.vidaLibre){
@@ -1143,7 +1152,7 @@ function normalize(o){
 function copia(o){ return JSON.parse(JSON.stringify(o)); }
 
 var state = normalize(null);
-var ui = {hist:null, histHold:false, pasados:[], coachQ:'', coachR:'', coachOn:false, anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genModo:'sorpresa', genVistos:[], tab:'hoy', sub:'vida', vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
+var ui = {hist:null, histHold:false, pasados:[], coachQ:'', coachR:'', coachOn:false, anim:true, recOff:0, fotoPara:'', catG:'palabras', gf:{donde:'todas', costo:'todas', plan:'todas'}, gen:null, genModo:'sorpresa', genVistos:[], tab:'hoy', sub:'preguntas', pregCat:'esto', vida:'basicos', crecer:'semana', citaF:'todas', citaSel:'', filtro:'todas', abierta:null, offset:0, modo:'memoria', listo:false, hoja:null, foco:null, borrar:false};
 var docRef = null, habiaLocal = false;
 var saveTimer = null, escribiendo = false, pendiente = false;
 
@@ -1447,7 +1456,7 @@ function ritualEstado(r){
 }
 function hayEjemplos(){
   if(state.inicioEj || state.amorEj || state.chequeoEj) return true;
-  var k = ['notas','regalos','fechas','semana','focos','revisiones','aprend','valoro','pedidos','temas','log'];
+  var k = ['notas','regalos','fechas','semana','focos','revisiones','aprend','valoro','pedidos','temas','log','respuestas'];
   for(var i=0;i<k.length;i++) if(state[k[i]].some(function(x){ return x.ej; })) return true;
   if(state.rituales.some(function(r){ return r.ejU; })) return true;
   return state.manual.some(function(m){ return BLOQUES.some(function(b){ return m[b.id].some(function(x){ return x.ej; }); }); });
@@ -1487,6 +1496,9 @@ function gestos(){
   state.valoro.filter(function(x){ return !x.dicho; }).slice(0, 5).forEach(function(x){
     pers.push({texto:'Dile hoy esto que valoras de ella, con tus palabras.', cita:x.texto, porque:'Lo que valoro'});
   });
+  state.respuestas.forEach(function(x){
+    if(x.cat === 'querer' && x.a) prio.push({texto:'Hazlo como ella te dijo.', cita:x.a, porque:'Me respondió'});
+  });
   state.aprend.forEach(function(a){
     if(a.acuerdo) pers.push({texto:'Ten presente lo que acordaron la última vez.', cita:a.acuerdo, porque:'De mis aprendizajes'});
   });
@@ -1523,7 +1535,7 @@ function clasificar(t){
   return 'palabras';
 }
 var PORQUE_EJE = {'Fecha cercana':'detalles', 'Lo que trae María':'tiempo', 'Chequeo':'tiempo', 'Pendiente de decirle':'palabras', 'Pendiente de hablar':'tiempo',
-  'Me lo pidió':'actos', 'Lo que valoro':'palabras', 'De mis aprendizajes':'actos', 'De su manual':'actos'};
+  'Me lo pidió':'actos', 'Me respondió':'actos', 'Lo que valoro':'palabras', 'De mis aprendizajes':'actos', 'De su manual':'actos'};
 function ritualEje(r){
   if(r.cat && EJE_N[r.cat]) return r.cat;
   for(var i=0;i<CATALOGO.length;i++) for(var j=0;j<CATALOGO[i].g.length;j++)
@@ -1812,7 +1824,7 @@ function render(){
     '<div class="cab">' + v.cab + '</div>' +
     '<main>' + v.cuerpo + '</main>' +
     '<nav class="tabs" aria-label="Secciones"><div class="tabs-in">' +
-      tabBtn('hoy', 'Hoy', I.sol) + tabBtn('maria', 'María', I.cora) + tabBtn('crecer', 'Crecer', I.crecer) + tabBtn('guias', 'Guías', I.guia) + tabBtn('fechas', 'Fechas', I.cal) +
+      tabBtn('hoy', 'Hoy', I.sol) + tabBtn('crecer', 'Crecer', I.crecer) + tabBtn('maria', 'María', I.cora) + tabBtn('guias', 'Guías', I.guia) + tabBtn('fechas', 'Fechas', I.cal) +
     '</div></nav>';
   if(ui.anim){
     var mn = app.querySelector('main');
@@ -1894,44 +1906,6 @@ function vistaHoy(){
     '<div class="hm"><div class="hm-g" role="img" aria-label="Gestos de las últimas 12 semanas">' + celdas + '</div>' +
       '<div class="hm-p"><span>12 semanas</span><span>Mejor racha: ' + r.mejor + '</span></div></div></section>';
 
-  var rt = retoSemana(), rc = EJE_COL[rt.r.c] || 'lila', segs = '';
-  var cumplidos = Object.keys(state.retos).filter(function(x){ return state.retos[x].ok; }).length;
-  for(var si=0; si<rt.r.n; si++) segs += '<i class="' + (si < rt.n ? 'on' : '') + '"></i>';
-  h += '<section class="reto g-' + rc + (rt.ok ? ' ok' : '') + '">' +
-    '<div class="reto-top"><span>Reto de la semana</span><span>' + plural(cumplidos, 'reto cumplido', 'retos cumplidos') + '</span></div>' +
-    '<p class="reto-t">' + esc(rt.r.t) + '</p><p class="reto-d">' + esc(rt.r.d) + '</p>' +
-    '<div class="reto-p" aria-label="' + rt.n + ' de ' + rt.r.n + '">' + segs + '</div>' +
-    '<div class="gesto-b">' + (rt.ok ? '<span class="hecho-chip">' + I.ok + '¡Cumplido!</span>'
-      : '<button class="b b-pri" data-a="reto-mas">' + (rt.r.n > 1 ? 'Sumar uno (' + rt.n + '/' + rt.r.n + ')' : 'Lo cumplí') + '</button>' +
-        (rt.n === 0 ? '<button class="b b-sec" data-a="reto-otro">Otro reto</button>' : '')) + '</div></section>';
-
-  var ini0 = parse(state.inicio);
-  if(ini0 && dias(ini0, t) >= 0){
-    var tj = tiempoJuntas(ini0, t);
-    var an = fechasTodas().filter(function(f){ return f.id === 'aniv'; })[0];
-    var prog = an ? Math.max(0.02, Math.min(1, 1 - an.faltan / 365)) : 0;
-    h += '<section class="tarjeta juntas2 g-rosa"><div class="j-top">' +
-        (state.fotoMaria ? '<img class="j-foto" alt="" src="' + esc(fotoSrc(state.fotoMaria)) + '">' : '<span class="j-ico">' + I.cora + '</span>') +
-        '<span class="rev-l">Juntas desde el ' + ini0.getDate() + ' de ' + MESES_L[ini0.getMonth()] + ' de ' + ini0.getFullYear() + '</span></div>' +
-      '<div class="j-num">' +
-        '<div><b data-n="' + tj.a + '">' + tj.a + '</b><span>' + (tj.a === 1 ? 'año' : 'años') + '</span></div>' +
-        '<div><b data-n="' + tj.m + '">' + tj.m + '</b><span>' + (tj.m === 1 ? 'mes' : 'meses') + '</span></div>' +
-        '<div><b data-n="' + tj.d + '">' + tj.d + '</b><span>' + (tj.d === 1 ? 'día' : 'días') + '</span></div></div>' +
-      (an ? '<div class="j-barra"><i style="width:' + (prog * 100).toFixed(1) + '%"></i><span class="j-cora" style="left:' + (prog * 100).toFixed(1) + '%">' + I.cora + '</span></div>' +
-        '<p class="meta j-pie">' + (an.faltan === 0 ? '¡Hoy cumplen ' + plural(an.anios, 'año', 'años') + '!' : 'Faltan ' + plural(an.faltan, 'día', 'días') + ' para sus ' + plural(an.anios, 'año', 'años')) + '</p>' : '') +
-      '</section>';
-  } else {
-    h += '<button class="tarjeta juntas-c" data-a="ajustes"><div class="anillo-w" aria-hidden="true">' + I.cora + '</div>' +
-      '<div><p class="juntas-t">¿Desde cuándo están juntas?</p></div></button>';
-  }
-
-  if(state.fotos.length){
-    var rr = rng(iso(t) + 'f'), rIdx = (Math.floor(rr() * state.fotos.length) + ui.recOff) % state.fotos.length, rf = state.fotos[rIdx];
-    h += '<section class="rec"><button class="rec-img" data-a="ver-foto" data-id="' + rf.id + '" aria-label="Ver foto"><img alt="' + esc(rf.nota || 'Foto de nosotras') + '" src="' + esc(fotoSrc(rf)) + '"></button>' +
-      '<div class="rec-pie"><span class="rec-l">Un recuerdo</span>' + (rf.nota ? '<p>' + esc(rf.nota) + '</p>' : '') + '</div>' +
-      (state.fotos.length > 1 ? '<button class="rec-otro" data-a="rec-otro">Otro</button>' : '') + '</section>';
-  }
-
   var venc = state.rituales.map(function(x){ return {x:x, e:ritualEstado(x)}; }).filter(function(o){ return o.e.vencido; })
     .sort(function(a, b){ return b.e.dias / (+b.x.cada || 14) - a.e.dias / (+a.x.cada || 14); });
   if(venc.length){
@@ -1989,7 +1963,7 @@ function filaFecha(f, conBorrar){
 }
 
 function vistaMaria(){
-  var subs = [['vida','Su vida'],['fichas','Fichas'],['regalos','Regalos'],['valoro','Valoro']];
+  var subs = [['preguntas','Preguntas'],['fichas','Fichas'],['regalos','Regalos'],['valoro','Valoro']];
   var apuntes = state.manual.reduce(function(s, m){ return s + BLOQUES.reduce(function(a, b){ return a + m[b.id].length; }, 0); }, 0);
   var elegidos = state.amor.map(amorDe).filter(Boolean);
   var cum = state.fechas.filter(function(f){ return f.nacio; })[0], dn = cum ? parse(cum.fecha) : null, tt = hoy(), info = [];
@@ -2020,7 +1994,7 @@ function vistaMaria(){
     subs.map(function(s){
       return '<button role="tab" data-a="sub" data-v="' + s[0] + '" aria-selected="' + (ui.sub === s[0]) + '">' + s[1] + '</button>';
     }).join('') + '</div>';
-  h += ui.sub === 'vida' ? vistaVida() : ui.sub === 'regalos' ? vistaRegalos() : ui.sub === 'valoro' ? vistaValoro() : vistaFichas();
+  h += ui.sub === 'preguntas' || ui.sub === 'vida' ? vistaPreguntas() : ui.sub === 'regalos' ? vistaRegalos() : ui.sub === 'valoro' ? vistaValoro() : vistaFichas();
   return {cab:cab, cuerpo:h};
 }
 
@@ -2029,11 +2003,59 @@ function preguntaSemana(){
   return PREGUNTAS[((n % PREGUNTAS.length) + PREGUNTAS.length) % PREGUNTAS.length];
 }
 
+var PREG_CATS = [['esto','Esto o esto'],['querer','Cómo quererla'],['conocerla','Conocerla'],['mias','Mías']];
+var PREG_BANCO = {
+  esto: ['¿Café o té?','¿Playa o montaña?','¿Plan en casa o salir?','¿Mensajes o llamadas?','¿Dulce o salado?','¿Mañana o noche?',
+    '¿Sorpresas o planes que tú eliges?','¿Película o serie?','¿Abrazo o beso?','¿Flores o comida?','¿Viajar lejos o escapadas cortas?',
+    '¿Regalo hecho a mano o comprado?','¿Desayuno o cena juntas?','¿Hablarlo en el momento o al día siguiente?','¿Que te cuide o que te dé espacio cuando estás triste?'],
+  querer: ['¿Qué te hace sentir más querida?','¿Cómo te gusta que te quiera cuando tienes un mal día?','¿Qué hago que te hace sentir escuchada?',
+    '¿Qué te gustaría que hiciera más seguido?','¿Qué cosa pequeña podría hacer para que tus días sean más fáciles?','¿Qué necesitas de mí cuando discutimos?',
+    '¿Cuándo sientes que te doy por sentada?','¿Cómo te gusta que te pida perdón?','¿Qué detalle mío te acuerdas más?','¿Prefieres que te diga las cosas o que te las demuestre?'],
+  conocerla: PREGUNTAS
+};
+function pregLista(cat){
+  if(cat === 'mias') return state.pregMias.map(function(x){ return {q:x.q, id:x.id}; });
+  return (PREG_BANCO[cat] || []).map(function(q){ return {q:q}; });
+}
+function respuestaDe(q){ for(var i=0;i<state.respuestas.length;i++) if(state.respuestas[i].q === q) return state.respuestas[i]; return null; }
+function vistaPreguntas(){
+  var cat = ui.pregCat, lista = pregLista(cat);
+  var pend = lista.filter(function(x){ return !respuestaDe(x.q); });
+  var h = '<div class="chips">' + PREG_CATS.map(function(c){
+    return '<button class="chip" data-a="preg-cat" data-v="' + c[0] + '" aria-pressed="' + (cat === c[0]) + '">' + c[1] + '</button>';
+  }).join('') + '</div>';
+  h += '<button class="tarjeta preg-azar" data-a="preg-azar"' + (pend.length ? '' : ' disabled') + '><span class="preg-azar-b">' + blob('circulo', '#22A699') + '</span>' +
+    '<span><b>Una al azar</b><span class="meta">' + plural(pend.length, 'pregunta sin responder', 'preguntas sin responder') + '</span></span></button>';
+  if(pend.length) h += '<div class="lista">' + pend.map(function(x){
+    return '<div class="fila"><button class="fila-c preg-q" data-a="preg-abrir" data-v="' + esc(x.q) + '"><p class="nota-x">' + esc(x.q) + '</p></button>' +
+      (x.id ? '<button class="mini" data-a="del-preg" data-id="' + x.id + '" aria-label="Quitar pregunta">' + I.x + '</button>' : '') + '</div>';
+  }).join('') + '</div>';
+  if(cat === 'mias') h += '<div class="agregar"' + (pend.length ? '' : ' style="margin-top:0"') + '><input class="campo" data-foco="preg" data-enter="add-preg" maxlength="160" placeholder="Mi pregunta" aria-label="Mi pregunta">' +
+    '<button class="b b-sec" data-a="add-preg">Agregar</button></div>';
+  else if(!pend.length) h += '<div class="vacio">' + blob() + '<p>Ya respondió todas</p></div>';
+  var resp = state.respuestas.slice().sort(function(a, b){ return (b.fecha || '') > (a.fecha || '') ? 1 : -1; });
+  if(resp.length){
+    h += sec('Sus respuestas', resp.length) + '<div class="lista">' + resp.map(function(x){
+      var d = parse(x.fecha);
+      return '<div class="fila fila-f"><button class="fila-c preg-q" data-a="preg-abrir" data-v="' + esc(x.q) + '"><p class="meta preg-r-q">' + esc(x.q) + '</p>' +
+        '<p class="nota-x">' + esc(x.a) + '</p>' + (d ? '<p class="meta">' + esc(fechaCorta(d)) + '</p>' : '') + '</button>' +
+        '<button class="mini" data-a="del-resp" data-id="' + x.id + '" aria-label="Borrar respuesta">' + I.x + '</button></div>';
+    }).join('') + '</div>';
+  }
+  return h;
+}
+function hojaPregunta(q){
+  var r = respuestaDe(q);
+  abrirHoja(
+    '<h2 id="ht">' + esc(q) + '</h2>' +
+    '<label for="pr-a">Su respuesta</label>' +
+    '<textarea class="campo" id="pr-a" data-auto maxlength="600">' + esc(r ? r.a : '') + '</textarea>' +
+    '<p class="error" id="pr-e" role="alert"></p>' +
+    '<div class="hoja-b"><button class="b b-sec" data-a="cerrar">Cancelar</button><button class="b b-pri" data-a="guardar-resp" data-v="' + esc(q) + '">Guardar</button></div>', 'pregunta');
+}
+
 function vistaFichas(){
-  var h = '<div class="tarjeta preg"><p class="preg-l">Esta semana le pregunto</p>' +
-    '<p class="preg-x">' + esc(preguntaSemana()) + '</p>' +
-    '<button class="b b-sec b-chico" data-a="nota" data-v="dijo">Anotar su respuesta</button></div>';
-  h += '<div class="chips">' +
+  var h = '<div class="chips">' +
     '<button class="chip" data-a="filtro" data-v="todas" aria-pressed="' + (ui.filtro === 'todas') + '">Todas</button>' +
     CATS.map(function(c){
       return '<button class="chip" data-a="filtro" data-v="' + c.id + '" aria-pressed="' + (ui.filtro === c.id) + '">' + c.nombre + '</button>';
@@ -2148,14 +2170,6 @@ function vistaCrecer(){
   var t = hoy(), k = iso(t), h = '';
   var cab = '<h1 class="titulo">Crecer</h1>';
   h += radar();
-  var ym = k.slice(0, 7);
-  var gMes = Object.keys(state.hechos).filter(function(x){ return x.indexOf(ym) === 0; }).length;
-  var porHablar = state.temas.filter(function(x){ return !x.hablado; }).length;
-  var dichas = state.valoro.filter(function(x){ return x.dicho; }).length;
-  h += '<div class="stats">' +
-    '<div class="stat"><b>' + gMes + '</b><span>' + (gMes === 1 ? 'gesto este mes' : 'gestos este mes') + '</span></div>' +
-    '<div class="stat"><b>' + porHablar + '</b><span>' + (porHablar === 1 ? 'tema por hablar' : 'temas por hablar') + '</span></div>' +
-    '<div class="stat"><b>' + dichas + '</b><span>' + (dichas === 1 ? 'cosa que le dije' : 'cosas que le dije') + '</span></div></div>';
   var subs = [['semana','Lo mío'],['hablar','Por hablar'],['habitos','Gestos'],['aprend','Aprendí']];
   h += '<div class="seg" role="tablist">' + subs.map(function(s){
     return '<button role="tab" data-a="crecer-sub" data-v="' + s[0] + '" aria-selected="' + (ui.crecer === s[0]) + '">' + s[1] + '</button>';
@@ -2220,9 +2234,6 @@ function tarjetaChequeo(corta){
     '<div class="cheq-b">' +
       (e.dias === 0 ? '<span class="pill pill-ok">' + I.ok + 'Hoy</span>'
                     : '<button class="b ' + (e.toca ? 'b-pri' : 'b-sec') + ' b-chico" data-a="chequeo-hoy">Ya lo tuvimos</button>') +
-      (corta ? '' : '<select class="campo campo-chica" data-c="chequeo-cada" aria-label="Cada cuánto quiero el chequeo">' + RITMOS.map(function(r){
-        return '<option value="' + r[0] + '"' + (r[0] === (+state.chequeo.cada || 30) ? ' selected' : '') + '>' + r[1] + '</option>';
-      }).join('') + '</select>') +
     '</div></section>';
 }
 
@@ -2316,7 +2327,6 @@ function crecerHabitos(){
     }).join('') + '</div>';
   }
   h += '<button class="captura" data-a="ritual">' + I.mas + '<span>Nuevo gesto</span></button>';
-  h += sec('Descubre gestos') + vistaMazo();
   var tengo = state.rituales.map(function(x){ return x.nombre.toLowerCase(); });
   var cat = CATALOGO.filter(function(c){ return c.id === ui.catG; })[0] || CATALOGO[0];
   h += sec('Todos los gestos', CATALOGO.reduce(function(n, c){ return n + c.g.length; }, 0)) +
@@ -2408,18 +2418,13 @@ function vistaGuias(){
   var h = guia('pausa', 'Antes de contestar', '', blob('circulo', '#8E63E8')) +
     guia('disculpa', 'Disculparme bien', '', blob('gota', '#FF8A3D', 'feliz')) +
     guia('dificil', 'Decir algo difícil', '', blob('nube', '#5B7FE0'));
-  h += sec('Generador de citas') + mi('cuando no se me ocurre nada: le pico y sale un plan completo') + vistaGenerador();
-  var lista = citasFiltradas();
-  h += sec('Ideas de cita', lista.length);
-  h += '<div class="chips">' + CITA_F.map(function(f){
-    return '<button class="chip" data-a="cita-f" data-v="' + f[0] + '" aria-pressed="' + (ui.citaF === f[0]) + '">' + f[1] + '</button>';
+  h += sec('Generador de citas') + vistaGenerador();
+  h += sec('Mis ideas de cita', state.citas.length);
+  if(state.citas.length) h += '<div class="lista">' + state.citas.map(function(c){
+    return '<div class="fila"><div class="fila-c"><p class="nota-x">' + esc(c.texto) + '</p></div>' +
+      '<button class="mini" data-a="del-cita" data-id="' + c.id + '" aria-label="Borrar idea">' + I.x + '</button></div>';
   }).join('') + '</div>';
-  h += '<div class="lista">' + lista.map(function(c){
-    var et = [c[1] === 'casa' ? 'En casa' : c[1] === 'fuera' ? 'Fuera' : '', c[2] === 'gratis' ? 'gratis' : ''].filter(Boolean).join(', ');
-    return '<div class="fila"><div class="fila-c"><p class="nota-x">' + esc(c[0]) + '</p><p class="meta">' + (c[3] ? 'Idea mía' : et) + '</p></div>' +
-      (c[3] ? '<button class="mini" data-a="del-cita" data-id="' + c[3] + '" aria-label="Borrar idea">' + I.x + '</button>' : '') + '</div>';
-  }).join('') + '</div>';
-  h += '<div class="agregar" style="margin-top:12px"><input class="campo" data-foco="cita" data-enter="add-cita" placeholder="Una idea mía" aria-label="Nueva idea de cita" maxlength="140">' +
+  h += '<div class="agregar"' + (state.citas.length ? ' style="margin-top:12px"' : ' style="margin-top:0"') + '><input class="campo" data-foco="cita" data-enter="add-cita" placeholder="Una idea mía" aria-label="Nueva idea de cita" maxlength="140">' +
     '<button class="b b-sec" data-a="add-cita">Agregar</button></div>';
   h += sec('Manual de María') + vistaManual();
   return {cab:cab, cuerpo:h};
@@ -2750,13 +2755,15 @@ function cargarEjemplos(){
   state.valoro.push({id:uid(), texto:'Me esperó despierta aunque estaba cansada', fecha:iso(masDias(t, -1)), dicho:false, ej:true},
                     {id:uid(), texto:'Cómo defiende a sus amigas', fecha:iso(masDias(t, -4)), dicho:true, ej:true});
   state.pedidos.push({id:uid(), texto:'Que le avise cuando llegue a casa', veces:3, ultimo:iso(masDias(t, -2)), ej:true});
+  state.respuestas.push({id:uid(), q:'¿Café o té?', a:'Café, pero en la tarde un té de manzanilla', cat:'esto', fecha:iso(masDias(t, -3)), ej:true},
+    {id:uid(), q:'¿Qué te hace sentir más querida?', a:'Que me escuches sin estar viendo el celular', cat:'querer', fecha:iso(masDias(t, -8)), ej:true});
   state.aprend.push({id:uid(), fecha:iso(masDias(t, -9)), que:'Discutimos porque llegué tarde sin avisar',
     parte:'No avisé, y luego minimicé que le molestara', acuerdo:'Avisar en cuanto sepa que voy tarde', ej:true});
 }
 function quitarEjemplos(){
   var ids = {};
   state.regalos.forEach(function(r){ if(r.ej) ids[r.id] = 1; });
-  ['notas','regalos','fechas','semana','focos','revisiones','aprend','valoro','pedidos','temas','log'].forEach(function(k){ state[k] = state[k].filter(function(x){ return !x.ej; }); });
+  ['notas','regalos','fechas','semana','focos','revisiones','aprend','valoro','pedidos','temas','log','respuestas'].forEach(function(k){ state[k] = state[k].filter(function(x){ return !x.ej; }); });
   Object.keys(state.retos).forEach(function(k){ if(state.retos[k].ej) delete state.retos[k]; });
   state.notas.forEach(function(n){ if(n.regaloId && ids[n.regaloId]) delete n.regaloId; });
   state.manual.forEach(function(m){ BLOQUES.forEach(function(b){ m[b.id] = m[b.id].filter(function(x){ return !x.ej; }); }); });
@@ -2776,6 +2783,31 @@ function accion(a, el){
     case 'tab': ui.tab = v; ui.anim = true; window.scrollTo(0, 0); render(); break;
     case 'sub': ui.sub = v; ui.anim = true; render(); break;
     case 'filtro': ui.filtro = v; render(); break;
+    case 'preg-cat': ui.pregCat = v; render(); break;
+    case 'preg-abrir': hojaPregunta(v); break;
+    case 'preg-azar':
+      var pz = pregLista(ui.pregCat).filter(function(x){ return !respuestaDe(x.q); });
+      if(pz.length) hojaPregunta(pz[Math.floor(Math.random() * pz.length)].q);
+      break;
+    case 'guardar-resp':
+      var pra = val('#pr-a');
+      if(!pra){ falta('#pr-e', 'Escribe su respuesta.', '#pr-a'); break; }
+      var prx = respuestaDe(v);
+      if(prx){ prx.a = pra; delete prx.ej; }
+      else {
+        var pcat = ui.pregCat;
+        PREG_CATS.forEach(function(c){ if(c[0] !== 'mias' && (PREG_BANCO[c[0]] || []).indexOf(v) >= 0) pcat = c[0]; });
+        state.respuestas.unshift({id:uid(), q:v, a:pra, cat:pcat, fecha:k});
+        anotar('tiempo', 'pregunta');
+      }
+      guardar(); cerrarHoja(); render(); toast('Guardado'); break;
+    case 'del-resp': state.respuestas = quitar(state.respuestas, id); guardar(); render(); toast('Borrado'); break;
+    case 'add-preg':
+      var pqi = document.querySelector('[data-foco="preg"]'), pqt = pqi ? pqi.value.trim() : '';
+      if(!pqt){ if(pqi) pqi.focus(); break; }
+      if(!/^¿/.test(pqt)) pqt = '¿' + pqt.replace(/\?+$/, '') + '?';
+      state.pregMias.push({id:uid(), q:pqt}); ui.foco = 'preg'; guardar(); render(); break;
+    case 'del-preg': state.pregMias = quitar(state.pregMias, id); guardar(); render(); break;
     case 'datos-copiar': hojaDatos(); break;
     case 'datos-pegar': hojaPegar(); break;
     case 'datos-cargar':
@@ -3115,7 +3147,7 @@ function accion(a, el){
     case 'quitar-ej': quitarEjemplos(); guardar(); cerrarHoja(); render(); toast('Ejemplos quitados'); break;
     case 'borrar':
       if(!ui.borrar){ ui.borrar = true; hojaAjustes(); ui.borrar = true; break; }
-      state = normalize(null); ui.tab = 'hoy'; ui.sub = 'vida'; ui.crecer = 'semana'; ui.citaSel = ''; ui.filtro = 'todas'; ui.abierta = null; ui.offset = 0;
+      state = normalize(null); ui.tab = 'hoy'; ui.sub = 'preguntas'; ui.crecer = 'semana'; ui.citaSel = ''; ui.filtro = 'todas'; ui.abierta = null; ui.offset = 0;
       guardar(); cerrarHoja(); render(); toast('Todo borrado'); break;
   }
 }
@@ -3171,7 +3203,6 @@ document.addEventListener('change', function(e){
     return;
   }
   var c = e.target && e.target.getAttribute ? e.target.getAttribute('data-c') : null;
-  if(c === 'chequeo-cada'){ state.chequeo.cada = +e.target.value || 14; guardar(); render(); }
 });
 document.addEventListener('keydown', function(e){
   if(ui.hist){
