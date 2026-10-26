@@ -693,6 +693,139 @@ main.anim .radar .rp{animation:abre .9s cubic-bezier(.2,.9,.3,1.2) both .15s}
 .coach-r.pensando{color:var(--muted);font-weight:600}
 .coach-r.pensando::after{content:"";display:inline-block;width:1.2em;text-align:left;animation:puntos 1.2s steps(4) infinite}
 @keyframes puntos{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
+
+/* ================= Nov 4: estilo suave ================= */
+:root{
+  --bg:#FFFFFF; --surface:#FFFFFF; --text:#1B1530; --muted:#7A7590; --line:#EFEDF5; --line2:#E2DFEC; --fill:#F5F4F9;
+  --accent:#6E3BD1; --accent-fg:#FFFFFF; --accent-soft:#EFE8FC; --accent-text:#5B2FB8;
+  --rosa:#6E3BD1; --rosa-soft:#EFE8FC; --lila-suave:#E6DAFA;
+  --grad:#8E63E8; --glow:rgba(110,59,209,.25);
+  --k-palabras:#8E63E8; --k-tiempo:#5B7FE0; --k-detalles:#FF8A3D; --k-actos:#22A699; --k-contacto:#F5A524;
+  --shadow:none;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121019; --surface:#1B1824; --text:#F3F1FA; --muted:#A39FB5; --line:#2A2636; --line2:#3A3548; --fill:#24212F;
+    --accent:#A586F2; --accent-fg:#16101F; --accent-soft:#2C2440; --accent-text:#C2AEF7;
+    --rosa:#A586F2; --rosa-soft:#2C2440; --lila-suave:#2C2440;
+    --grad:#8E63E8; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121019; --surface:#1B1824; --text:#F3F1FA; --muted:#A39FB5; --line:#2A2636; --line2:#3A3548; --fill:#24212F;
+  --accent:#A586F2; --accent-fg:#16101F; --accent-soft:#2C2440; --accent-text:#C2AEF7;
+  --rosa:#A586F2; --rosa-soft:#2C2440; --lila-suave:#2C2440;
+  --grad:#8E63E8; --shadow:none;
+}
+body{background:var(--bg)}
+.g-lila{--g1:#8E63E8;--g2:#A584F0}
+.g-cielo{--g1:#5B7FE0;--g2:#7A97EA}
+.g-menta{--g1:#22A699;--g2:#3DBDAF}
+.g-coral{--g1:#F26B4F;--g2:#F7876F}
+.g-rosa{--g1:#FF8A3D;--g2:#FFA25F}
+.g-amar{--g1:#F5A524;--g2:#F8B94B}
+
+/* tipografía más ligera */
+.titulo{font-weight:600;letter-spacing:-.025em;background:none;-webkit-text-fill-color:currentColor;color:var(--text)}
+.marca{font-weight:700}
+.marca::before{background:#8E63E8;border-radius:50%}
+.sub{font-weight:600}
+.fecha-hoy{font-weight:500}
+.fecha-t,.juntas-t{font-weight:600}
+.enlace{text-decoration:none;color:var(--accent-text);font-weight:600}
+
+/* sin sombras ni fondos que se mueven */
+.lista,.tarjeta,.sit,.captura,.stat,.icono,.tl-i .fila,.deck-b .redondo{box-shadow:none}
+.lista,.tarjeta,.sit{border-color:var(--line);border-radius:20px}
+.gesto,.reto,.gen-r,.dk,.fh.toca,.tl-i.toca .dia{animation:none;background:linear-gradient(135deg,var(--g1),var(--g2));box-shadow:none}
+.gesto::before,.gesto::after,.reto::before,.frente::after{display:none}
+.flama.viva,.j-cora,.tl-i.toca::before{animation:none;filter:none}
+
+/* botones y campos */
+.b{border-radius:12px;font-weight:600}
+.b-pri{background:var(--accent);color:var(--accent-fg);box-shadow:none}
+.b-sec{background:var(--fill)}
+.chip{font-weight:500;border-color:var(--line2)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.seg{background:var(--fill);border-radius:12px}
+.seg button{font-weight:600}
+.campo{background:var(--fill);border-color:transparent;border-radius:10px}
+.campo:focus-visible{background:var(--surface)}
+
+/* personajitos */
+.blob{display:block;width:100%;height:100%;overflow:visible}
+
+/* gesto de hoy */
+.frente{background:var(--lila-suave);color:var(--text);box-shadow:none}
+.frente-i{width:110px;height:110px;background:none;border-radius:0;animation:none;margin-bottom:2px}
+.frente-i svg{width:100%;height:100%}
+.frente b{font-weight:600;font-size:1.3rem}
+.frente span:last-child{color:var(--muted);opacity:1;font-weight:500}
+.gesto-x{font-weight:600}
+.gesto .b-pri{color:var(--g1)}
+
+/* racha */
+.flama{width:50px;height:50px}
+.flama.viva{color:#FF8A3D}
+.racha-n b{font-weight:600}
+.hm-c i{border-radius:4px}
+
+/* reto y tiempo juntas */
+.reto{border-radius:20px}
+.reto-t{font-weight:600}
+.j-num div{background:var(--fill)}
+.j-num b{font-weight:600;color:var(--text)}
+.j-barra i{background:#8E63E8}
+.j-ico{background:var(--lila-suave);color:#8E63E8}
+.j-cora{color:#8E63E8}
+
+/* fechas */
+.fh{background:var(--fill);border:0;border-radius:18px}
+.fh b{font-weight:600}
+.tl::before{background:var(--line2)}
+.tl-i .dia{background:var(--fill);color:var(--text)}
+.tl-i .dia span{color:var(--muted)}
+.toca .cuando{background:var(--accent-soft);color:var(--accent-text)}
+
+/* tarjetas */
+.rit .barra{background:var(--fill)}
+.muro{gap:10px}
+.nota{border-radius:18px;box-shadow:none;background:color-mix(in srgb,var(--g1) 14%,var(--surface))}
+.nota p{font-weight:500}
+.dk{border-radius:22px}
+.dk-t{font-weight:600}
+
+/* guías */
+.guia .ico{width:48px;height:48px;background:none;border-radius:0;padding:0}
+.guia .ico svg{width:48px;height:48px}
+.guia b{font-weight:600}
+
+/* generador */
+.gen-cara{width:64px;height:64px;margin:2px auto 12px}
+.gen-plan{font-weight:600}
+
+/* radar */
+.radar .rp{fill:#8E63E8;fill-opacity:.22;stroke:#8E63E8}
+.radar-h{font-weight:600}
+.radar-tip{font-weight:500;color:var(--muted);font-size:.88rem}
+
+/* vacíos */
+.vacio{border:0;background:var(--fill);border-radius:20px}
+.vacio .blob{width:56px;height:56px;margin:0 auto 10px}
+.deck-fin .blob{width:64px;height:64px;margin:0 auto 10px}
+
+/* bienvenida */
+.bien{padding:7vh 2px 30px}
+.bien-blobs{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:6px;margin:0 -6px 20px;padding:22px 10px 16px;border-radius:28px;background:linear-gradient(180deg,var(--bg),var(--lila-suave))}
+.bien-blobs svg{width:58px;height:58px}
+.bien-blobs svg:nth-child(2n){transform:translateY(-14px) rotate(-8deg)}
+.bien-blobs svg:nth-child(3){width:72px;height:72px}
+.marca-g{font-weight:700;margin-top:0}
+.bien-x{font-weight:500;font-size:1.1rem}
+
+/* barra inferior */
+.tab{font-weight:600}
+.tab[aria-current="page"] .tab-i{background:var(--accent-soft);animation:none}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -960,7 +1093,7 @@ var I = {
   flecha: svg('<path d="M6 9l6 6 6-6"/>'),
   comida: svg('<path d="M6 3v6a2.5 2.5 0 0 0 5 0V3M8.5 3v18M17.5 21v-8M17.5 13c-1.7 0-3-1.3-3-3.5C14.5 6 16 3.5 17.5 3z"/>'),
   bolsa: svg('<path d="M5 8h14l-1.2 12.5H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>'),
-  flama: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.5c-4.1 0-6.8-2.7-6.8-6.5 0-3.4 2.3-5.5 3.8-7.6.4 1.9 1.5 3.1 2.8 3.5.8-2.7 1.7-5.6 4-7.6.2 2.9 1.7 4.6 2.8 6.2 1 1.5 1.4 3 1.4 4.6 0 4.4-2.7 7.4-6.8 7.4z"/></svg>',
+  flama: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.5c-4.1 0-6.8-2.7-6.8-6.5 0-3.4 2.3-5.5 3.8-7.6.4 1.9 1.5 3.1 2.8 3.5.8-2.7 1.7-5.6 4-7.6.2 2.9 1.7 4.6 2.8 6.2 1 1.5 1.4 3 1.4 4.6 0 4.4-2.7 7.4-6.8 7.4z"/><path fill="#FFC23D" d="M12 21.2c-2.3 0-3.8-1.5-3.8-3.6 0-1.9 1.3-3 2.2-4.3.3 1 .9 1.6 1.6 1.9.5-1.5 1-2.9 2.2-4 .6 2.4 1.7 3.6 1.7 5.6 0 2.6-1.6 4.4-3.9 4.4z"/><circle cx="10.4" cy="17.4" r="1" fill="#1B1530"/><circle cx="13.6" cy="17.4" r="1" fill="#1B1530"/></svg>',
   play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>',
   cam: svg('<path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
   tag: svg('<path d="M3.5 12.5V4.5h8l9 9-8 8z"/><circle cx="8" cy="9" r="1.3"/>'),
@@ -1136,7 +1269,7 @@ function enUso(a){ return !!a && ((state.fotoMaria && state.fotoMaria.a === a) |
 function soltarAsset(a){ if(a && assetsNS && !enUso(a)) assetsNS.delete(a).catch(function(){}); }
 function pedirFotos(para){
   var inp = $('#foto-in'); if(!inp) return;
-  if(!assetsNS && para === 'galeria' && state.fotos.filter(function(f){ return f.d; }).length >= 15){ toast('Aquí ya no caben más fotos'); return; }
+  if(!assetsNS && para === 'galeria' && state.fotos.filter(function(f){ return f.d; }).length >= 15){ toast('Ya no caben más fotos'); return; }
   ui.fotoPara = para; inp.multiple = para === 'galeria'; inp.value = ''; inp.click();
 }
 function conectar(){
@@ -1167,6 +1300,28 @@ function conectar(){
       });
     });
   }).catch(function(){ /* se queda en este dispositivo */ });
+}
+
+/* ---------- personajitos ---------- */
+var BLOB_F = {
+  circulo:'<circle cx="50" cy="52" r="40"/>',
+  penta:'<path d="M50 8 92 39 76 88H24L8 39z" stroke-linejoin="round" stroke-width="10"/>',
+  nube:'<path d="M28 84a20 20 0 0 1-4-39 26 26 0 0 1 50-6 22 22 0 0 1 4 45z"/>',
+  flor:'<path d="M50 14a18 18 0 0 1 30 14 18 18 0 0 1 4 32 18 18 0 0 1-18 28 18 18 0 0 1-32 0A18 18 0 0 1 16 60a18 18 0 0 1 4-32 18 18 0 0 1 30-14z"/>',
+  gota:'<path d="M50 6c18 26 36 40 36 58a36 36 0 0 1-72 0c0-18 18-32 36-58z"/>',
+  rombo:'<rect x="18" y="18" width="64" height="64" rx="16" transform="rotate(45 50 50)"/>'
+};
+var BLOB_C = ['#8E63E8','#FF8A3D','#22A699','#5B7FE0','#F5A524','#F26B4F'];
+var BLOB_K = Object.keys(BLOB_F);
+var blobN = 0;
+function blob(forma, color, ojos){
+  var i = blobN++;
+  forma = forma || BLOB_K[i % BLOB_K.length]; color = color || BLOB_C[(i * 2 + 1) % BLOB_C.length];
+  var cara = ojos === 'feliz'
+    ? '<path d="M31 54q6-7 12 0M57 54q6-7 12 0" fill="none" stroke="#1B1530" stroke-width="4" stroke-linecap="round"/>'
+    : '<circle cx="37" cy="54" r="8" fill="#1B1530"/><circle cx="63" cy="54" r="8" fill="#1B1530"/><circle cx="39.5" cy="51.5" r="2.4" fill="#fff"/><circle cx="65.5" cy="51.5" r="2.4" fill="#fff"/>';
+  return '<svg class="blob" viewBox="0 0 100 100" aria-hidden="true"><g fill="' + color + '" stroke="' + color + '">' + BLOB_F[forma] + '</g>' + cara +
+    '<path d="M46 65q4 4 8 0" fill="none" stroke="#1B1530" stroke-width="3" stroke-linecap="round"/></svg>';
 }
 
 /* ---------- utilidades ---------- */
@@ -1522,7 +1677,7 @@ function mazo(){
 }
 function vistaMazo(){
   var m = mazo();
-  if(!m.length) return '<div class="deck"><p class="deck-fin">ya viste todos los gestos</p></div>';
+  if(!m.length) return '<div class="deck"><p class="deck-fin">' + blob() + 'Ya viste todos</p></div>';
   var top = m.slice(0, 3);
   return '<div class="deck" aria-live="polite">' + top.map(function(g, i){
       return '<div class="dk g-' + EJE_COL[g.eje] + '" data-pos="' + i + '"' + (i ? ' aria-hidden="true"' : '') + ' data-t="' + esc(g.t) + '">' +
@@ -1552,7 +1707,7 @@ function mazoAccion(tipo){
     });
   } else if(tipo === 'hoy'){
     lanzar(1, function(){
-      ui.pasados.push(g.t); anotar(g.eje, 'mazo'); guardar(); render(); burst(false); toast('¡Eso! Anotado para hoy');
+      ui.pasados.push(g.t); anotar(g.eje, 'mazo'); guardar(); render(); burst(false); toast('Anotado');
     });
   } else {
     lanzar(-1, function(){ ui.pasados.push(g.t); render(); });
@@ -1686,7 +1841,7 @@ function vistaBienvenida(){
   function punto(clase, icono, titulo, texto){
     return '<li><span class="ico ' + clase + '">' + icono + '</span><div><b>' + titulo + '</b><p>' + texto + '</p></div></li>';
   }
-  return '<div class="bien"><div class="logo" aria-hidden="true">' + I.cora + '</div>' +
+  return '<div class="bien"><div class="bien-blobs" aria-hidden="true">' + blob('penta','#5B7FE0') + blob('circulo','#FF8A3D') + blob('flor','#8E63E8','feliz') + blob('gota','#22A699') + blob('nube','#F5A524') + '</div>' +
     '<div class="marca-g">Nov</div>' +
     '<h1 class="bien-x">Para ser mejor pareja, un gesto a la vez.</h1>' +
     '<ul class="puntos">' +
@@ -1712,7 +1867,7 @@ function vistaHoy(){
 
   var g = gestoActual(), rev = state.revelado === k || g.hecho, col = EJE_COL[g.cat] || 'rosa';
   h += '<section class="flip' + (rev ? ' volteada' : '') + '" aria-label="Gesto de hoy"><div class="flip-in">' +
-    '<button class="cara frente" data-a="revelar"' + (rev ? ' inert' : '') + '><span class="frente-i">' + I.chispa + '</span><b>Tu gesto de hoy</b><span>Toca para verlo</span></button>' +
+    '<button class="cara frente" data-a="revelar"' + (rev ? ' inert' : '') + '><span class="frente-i">' + blob('flor', '#FF8A3D') + '</span><b>Gesto de hoy</b><span>Toca para verlo</span></button>' +
     '<div class="cara atras gesto g-' + col + (g.hecho ? ' hecho' : '') + '"' + (rev ? '' : ' inert') + '>' +
       '<div class="gesto-top"><span class="gesto-t">' + I.chispa + EJE_N[g.cat || 'palabras'] + '</span>' +
         (g.hecho ? '<span class="hecho-chip">' + I.ok + 'Hecho</span>' : (g.porque ? '<span class="porque">' + esc(g.porque) + '</span>' : '')) + '</div>' +
@@ -1793,7 +1948,7 @@ function vistaHoy(){
   h += sec('Lo que trae María', state.semana.length, '<button class="enlace" data-a="semana">Agregar</button>');
   h += mi('lo que trae María estos días. ya que le pregunte, lo palomeo');
   if(!state.semana.length){
-    h += '<div class="vacio" style="margin-top:0"><p>nada todavía. un examen, una entrega, algo que le preocupe</p></div>';
+    h += '<div class="vacio" style="margin-top:0">' + blob() + '<p>Nada todavía</p></div>';
   } else {
     var ord = state.semana.slice().sort(function(a, b){ return (a.fecha || '9999') < (b.fecha || '9999') ? -1 : 1; });
     h += '<div class="lista">' + ord.map(function(s){
@@ -1807,7 +1962,7 @@ function vistaHoy(){
   var todas = fechasTodas().filter(function(f){ return f.faltan >= 0; });
   h += sec('Próximas fechas', 0, todas.length ? '<button class="enlace" data-a="tab" data-v="fechas">Ver todas</button>' : '');
   if(!todas.length){
-    h += '<div class="vacio" style="margin-top:0"><p>todavía no hay fechas</p><button class="b b-sec" data-a="fecha">Agregar fecha</button></div>';
+    h += '<div class="vacio" style="margin-top:0">' + blob() + '<p>Nada todavía</p><button class="b b-sec" data-a="fecha">Agregar fecha</button></div>';
   } else {
     h += '<div class="fechas-h">' + todas.slice(0, 8).map(function(f, i){
       return '<button class="fh g-' + COLORES[i % COLORES.length] + (enVentana(f) ? ' toca' : '') + '" data-a="tab" data-v="fechas">' +
@@ -1886,7 +2041,7 @@ function vistaFichas(){
   h += mi('todo lo que sé de ella. el regalito lo manda a ideas de regalo') +
     '<button class="captura" style="margin-top:0" data-a="nota">' + I.mas + '<span>Anotar algo sobre María</span></button>';
   if(!state.notas.length){
-    return h + '<div class="vacio"><p>nada todavía. empezar con algo que me contó esta semana</p></div>';
+    return h + '<div class="vacio">' + blob() + '<p>Nada todavía</p></div>';
   }
   var cats = ui.filtro === 'todas' ? CATS : CATS.filter(function(c){ return c.id === ui.filtro; });
   var algo = false;
@@ -1905,7 +2060,7 @@ function vistaFichas(){
         '</div></div>';
     }).join('') + '</div>';
   });
-  if(!algo) h += '<div class="vacio"><p>No hay notas en «' + catNombre(ui.filtro) + '» todavía.</p></div>';
+  if(!algo) h += '<div class="vacio">' + blob() + '<p>Nada en «' + catNombre(ui.filtro) + '»</p></div>';
   return h;
 }
 
@@ -1941,7 +2096,7 @@ function vistaRegalos(){
   var h = mi('ideas para regalarle. cuando se lo dé, lo palomeo') +
     '<button class="captura" style="margin-top:0" data-a="regalo">' + I.mas + '<span>Agregar idea de regalo</span></button>';
   if(!state.regalos.length){
-    return h + '<div class="vacio"><p>sin ideas todavía. cuando diga qué bonito, apuntarlo aquí</p></div>';
+    return h + '<div class="vacio">' + blob() + '<p>Nada todavía</p></div>';
   }
   var pend = state.regalos.filter(function(r){ return !r.dado; });
   var dados = state.regalos.filter(function(r){ return r.dado; });
@@ -1961,7 +2116,7 @@ function vistaVida(){
   var h = '<div class="agregar" style="margin-top:0"><input class="campo" data-foco="vida" data-enter="add-vida" maxlength="300" placeholder="Algo que me contó" aria-label="Algo que me contó">' +
     '<button class="b b-pri" data-a="add-vida">Guardar</button></div>';
   var items = state.vidaExtra.slice().sort(function(a, b){ return (b.fecha || '') > (a.fecha || '') ? 1 : (b.fecha || '') < (a.fecha || '') ? -1 : 0; });
-  if(!items.length) return h + '<div class="vacio"><p>nada todavía</p></div>';
+  if(!items.length) return h + '<div class="vacio">' + blob() + '<p>Nada todavía</p></div>';
   if(items.length > 5) h += '<input class="campo buscar" type="search" data-buscar="vida" placeholder="Buscar" aria-label="Buscar en lo que me ha contado">';
   h += '<div class="lista vida-l">' + items.map(function(x){
     var d = parse(x.fecha);
@@ -1976,10 +2131,10 @@ function vistaValoro(){
   var h = mi('cosas que valoro de ella. decírselas, no nada más apuntarlas') +
     '<div class="agregar" style="margin-top:0"><input class="campo" data-foco="valoro" data-enter="add-valoro" maxlength="200" placeholder="Qué valoro de María" aria-label="Qué valoro de María">' +
     '<button class="b b-pri" data-a="add-valoro">Guardar</button></div>';
-  if(!state.valoro.length) return h + '<div class="vacio"><p>nada todavía</p></div>';
+  if(!state.valoro.length) return h + '<div class="vacio">' + blob() + '<p>Nada todavía</p></div>';
   var orden = state.valoro.filter(function(x){ return !x.dicho; }).concat(state.valoro.filter(function(x){ return x.dicho; }));
   h += '<div class="muro">' + orden.map(function(x, i){
-    var rot = ((i * 37) % 7 - 3) * .7;
+    var rot = 0;
     return '<div class="nota g-' + COLORES[(i * 3) % COLORES.length] + (x.dicho ? ' dicha' : '') + '" style="--r:' + rot.toFixed(1) + 'deg">' +
       (x.dicho ? '<span class="sello">Dicho</span>' : '') +
       '<p>' + esc(x.texto) + '</p><div class="nota-b">' +
@@ -2028,16 +2183,14 @@ function radar(){
     g += '<text x="' + q[0] + '" y="' + (+q[1] + 4) + '" text-anchor="' + anc + '"' + (suyo ? ' class="suyo"' : '') + '>' + (suyo ? '★ ' : '') + EJE_N[e] + '</text>';
   });
   var tip;
-  if(!total) tip = 'todavía no hay gestos este mes';
+  if(!total) tip = 'Sin gestos este mes';
   else {
     var orden = EJES.slice().sort(function(a, b){ return cnt[b] - cnt[a]; }), top = orden[0];
     var suyos = state.amor.filter(function(e){ return EJES.indexOf(e) >= 0; });
     if(suyos.length){
       var bajo = suyos.slice().sort(function(a, b){ return cnt[a] - cnt[b]; })[0], nom = (amorDe(bajo) || {n:EJE_N[bajo]}).n.toLowerCase();
-      tip = cnt[bajo] > 0 && cnt[bajo] >= cnt[top] * .6 ? 'Vas muy bien: le estás dando ' + nom + ', que es justo como se siente querida.'
-        : bajo === top ? 'Vas muy bien con ' + nom + ', que es justo como se siente querida.'
-        : 'Le has dado ' + EJE_MUCHO[top] + '. Ella se siente querida con ' + nom + ': ahí hay chance de más.';
-    } else tip = 'Lo que más le das: ' + EJE_N[top].toLowerCase() + '. Lo que menos: ' + EJE_N[orden[orden.length - 1]].toLowerCase() + '.';
+      tip = 'Más: ' + EJE_N[top].toLowerCase() + ' · Se siente querida con: ' + nom;
+    } else tip = 'Más: ' + EJE_N[top].toLowerCase() + ' · Menos: ' + EJE_N[orden[orden.length - 1]].toLowerCase();
   }
   return '<section class="tarjeta radar-c"><h2 class="radar-h">Así la estoy queriendo</h2><p class="meta">Últimos 30 días</p>' +
     '<svg class="radar" viewBox="0 0 300 270" role="img" aria-label="' + EJES.map(function(e){ return EJE_N[e] + ' ' + cnt[e]; }).join(', ') + '">' +
@@ -2116,7 +2269,7 @@ function tipoDe(id){ for(var i=0;i<TIPOS.length;i++) if(TIPOS[i][0] === id) retu
 function crecerHablar(t){
   var h = mi('lo que traigo pendiente de decirle, o de esto o de lo otro. cuando lo hablemos, anotar cómo salió') +
     '<button class="captura" style="margin-top:0" data-a="tema">' + I.mas + '<span>Anotar un tema</span></button>';
-  if(!state.temas.length) return h + '<div class="vacio"><p>nada pendiente por ahora</p></div>';
+  if(!state.temas.length) return h + '<div class="vacio">' + blob() + '<p>Nada todavía</p></div>';
   var pend = state.temas.filter(function(x){ return !x.hablado; }).sort(function(a, b){
     var ua = a.urge === 'pronto' ? 0 : 1, ub = b.urge === 'pronto' ? 0 : 1;
     return ua - ub || ((a.fecha || '') < (b.fecha || '') ? -1 : 1);
@@ -2150,7 +2303,7 @@ function crecerHablar(t){
 function crecerHabitos(){
   var h = '';
   if(!state.rituales.length){
-    h += '<div class="vacio" style="margin-top:0"><p>todavía no hay gestos</p></div>';
+    h += '<div class="vacio" style="margin-top:0">' + blob() + '<p>Nada todavía</p></div>';
   } else {
     h += '<div class="lista">' + state.rituales.map(function(x){
       var e = ritualEstado(x);
@@ -2182,7 +2335,7 @@ function crecerHabitos(){
 function crecerAprend(){
   var h = mi('después de una discusión: qué pasó, qué hice yo y en qué quedamos') +
     '<button class="captura" style="margin-top:0" data-a="aprend">' + I.mas + '<span>Agregar aprendizaje</span></button>';
-  if(!state.aprend.length) return h + '<div class="vacio"><p>ninguno todavía</p></div>';
+  if(!state.aprend.length) return h + '<div class="vacio">' + blob() + '<p>Nada todavía</p></div>';
   h += '<div class="lista" style="margin-top:14px">' + state.aprend.map(function(a){
     var d = parse(a.fecha);
     return '<div class="fila fila-f apr"><div class="fila-c"><p class="fecha-t">' + esc(a.que) + '</p>' +
@@ -2220,11 +2373,10 @@ function generarCita(){
 }
 function vistaGenerador(){
   var perso = ui.genModo === 'perso';
-  var h = '<div class="tarjeta gen"><div class="seg gen-modo" role="tablist">' +
+  var h = '<div class="tarjeta gen"><div class="gen-cara">' + blob('nube', '#8E63E8') + '</div><div class="seg gen-modo" role="tablist">' +
     [['sorpresa','Sorpréndeme'],['perso','Personalizada']].map(function(m){
       return '<button role="tab" data-a="gen-modo" data-v="' + m[0] + '" aria-selected="' + (ui.genModo === m[0]) + '">' + m[1] + '</button>';
     }).join('') + '</div>' +
-  (perso ? '' : '<p class="meta gen-sorpresa">Sin pensarle: te armo un plan completo con lo que hay.</p>') +
   (perso ? GEN_F.map(function(f){
     return '<span class="rot" id="gf-' + f.g + '">' + f.n + '</span><div class="chips env" role="group" aria-labelledby="gf-' + f.g + '">' + f.o.map(function(o){
       return '<button class="chip" data-a="gen-f" data-g="' + f.g + '" data-v="' + o[0] + '" aria-pressed="' + (ui.gf[f.g] === o[0]) + '">' + o[1] + '</button>';
@@ -2253,9 +2405,9 @@ function vistaGuias(){
     return '<button class="tarjeta guia g-' + ({pausa:'lila', disculpa:'rosa', dificil:'cielo'}[a] || 'coral') + '" data-a="' + a + '"><span class="ico" aria-hidden="true">' + icono + '</span>' +
       '<span><b>' + titulo + '</b></span>' + I.flecha + '</button>';
   }
-  var h = vistaCoach() + guia('pausa', 'Antes de contestar', 'abrir cuando estemos peleando o yo esté enojada', I.guia) +
-    guia('disculpa', 'Disculparme bien', 'tres frases y sale la disculpa. sin peros', I.cora) +
-    guia('dificil', 'Decir algo difícil', 'para decir lo que me molesta sin que suene a reclamo', I.chat);
+  var h = guia('pausa', 'Antes de contestar', '', blob('circulo', '#8E63E8')) +
+    guia('disculpa', 'Disculparme bien', '', blob('gota', '#FF8A3D', 'feliz')) +
+    guia('dificil', 'Decir algo difícil', '', blob('nube', '#5B7FE0'));
   h += sec('Generador de citas') + mi('cuando no se me ocurre nada: le pico y sale un plan completo') + vistaGenerador();
   var lista = citasFiltradas();
   h += sec('Ideas de cita', lista.length);
@@ -2279,7 +2431,7 @@ function vistaFechas(){
   var h = mi('su cumple, el aniversario y lo importante. me avisa antes') +
     '<button class="captura" style="margin-top:0" data-a="fecha">' + I.mas + '<span>Agregar fecha</span></button>';
   if(!todas.length){
-    return {cab:cab, cuerpo:h + '<div class="vacio"><p>todavía no hay fechas. empezar por su cumple</p></div>'};
+    return {cab:cab, cuerpo:h + '<div class="vacio">' + blob() + '<p>Nada todavía</p></div>'};
   }
   var prox = todas.filter(function(f){ return f.faltan >= 0; });
   var pas = todas.filter(function(f){ return f.faltan < 0; });
@@ -2652,7 +2804,7 @@ function accion(a, el){
       var rx = retoSemana(), nn = Math.min(rx.r.n, rx.n + 1), okr = nn >= rx.r.n;
       state.retos[rx.key] = {i:rx.i, n:nn, ok:okr};
       anotar(rx.r.c, 'reto'); guardar(); render(); burst(okr);
-      if(okr) toast('¡Reto cumplido!');
+      if(okr) toast('Reto cumplido');
       break;
     case 'reto-otro':
       var ro = retoSemana(); state.retos[ro.key] = {i:(ro.i + 1) % RETOS.length, n:0, ok:false}; guardar(); render();
@@ -2676,7 +2828,7 @@ function accion(a, el){
     case 'foto-perfil':
       var fp = buscar(state.fotos, id); if(!fp) break;
       var antes = state.fotoMaria; state.fotoMaria = fp.a ? {a:fp.a} : {d:fp.d}; if(antes && antes.a !== fp.a) soltarAsset(antes.a);
-      guardar(); cerrarHoja(); render(); toast('Lista, ya es su foto'); break;
+      guardar(); cerrarHoja(); render(); toast('Foto actualizada'); break;
     case 'foto-borrar':
       if(!ui.borrar){ ui.borrar = true; hojaFoto(id); ui.borrar = true; break; }
       var fb = buscar(state.fotos, id); state.fotos = quitar(state.fotos, id); if(fb) soltarAsset(fb.a);
@@ -2718,7 +2870,7 @@ function accion(a, el){
     case 'guardar-hablado':
       var tmH = buscar(state.temas, id);
       if(tmH){ tmH.hablado = k; tmH.resultado = val('#hb-r'); delete tmH.ej; anotar('tiempo', 't'); burst(false); }
-      guardar(); cerrarHoja(); render(); toast('Qué bueno que lo hablaron'); break;
+      guardar(); cerrarHoja(); render(); toast('Guardado'); break;
     case 'del-tema': state.temas = quitar(state.temas, id); guardar(); render(); toast('Borrado'); break;
     case 'vida-abrir': ui.vida = ui.vida === v ? null : v; render(); break;
     case 'add-vida-extra':
@@ -2763,7 +2915,7 @@ function accion(a, el){
       if(!vt){ if(vi) vi.focus(); break; }
       state.valoro.unshift({id:uid(), texto:vt, fecha:k, dicho:false});
       if(state.valoro.length > 200) state.valoro = state.valoro.slice(0, 200);
-      guardar(); render(); toast('Guardado. Ahora díselo'); break;
+      guardar(); render(); toast('Guardado'); break;
     case 'valoro-dicho':
       var vd = buscar(state.valoro, id); if(!vd) break;
       vd.dicho = !vd.dicho; if(vd.dicho){ anotar('palabras', 'v'); } guardar(); render(); if(vd.dicho) burst(false); break;
@@ -3014,7 +3166,7 @@ document.addEventListener('change', function(e){
       });
     });
     cadena.then(function(){
-      toast(para === 'avatar' ? 'Lista, ya tiene foto' : hechas === 1 ? 'Foto guardada' : plural(hechas, 'foto guardada', 'fotos guardadas'));
+      toast(para === 'avatar' ? 'Foto actualizada' : hechas === 1 ? 'Foto guardada' : plural(hechas, 'foto guardada', 'fotos guardadas'));
     }, errorFoto);
     return;
   }
